@@ -1,0 +1,55 @@
+{
+  "name": "airesumecraft",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @airesumecraft/editor --filter @airesumecraft/portfolio dev",
+    "dev:editor": "pnpm --filter @airesumecraft/editor dev",
+    "dev:portfolio": "pnpm --filter @airesumecraft/portfolio dev",
+    "build": "pnpm -r --sort --if-present build",
+    "build:editor": "pnpm --filter @airesumecraft/editor build",
+    "generate": "pnpm --filter @airesumecraft/portfolio generate",
+    "preview:editor": "pnpm --filter @airesumecraft/editor preview",
+    "preview:portfolio": "pnpm --filter @airesumecraft/portfolio preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "pnpm -r --if-present test:unit",
+    "test:e2e": "playwright test",
+    "storybook": "pnpm --filter @airesumecraft/editor storybook",
+    "build-storybook": "pnpm --filter @airesumecraft/editor build-storybook",
+    "lhci": "lhci autorun",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@commitlint/cli": "^21.2.0",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.61.1",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "playwright": "^1.61.1",
+    "prettier": "^3.9.4",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
+    "vue-tsc": "^3.3.6"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,vue,js,mjs,cjs,json,md,css,yml,yaml}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

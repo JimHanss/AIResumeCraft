@@ -1,0 +1,17 @@
+shellEmulator: true
+
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  msw: true
+
+peerDependencyRules:
+  allowedVersions:
+    '@nuxt/schema': ^3.21.8

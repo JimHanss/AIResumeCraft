@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+    command: pnpm dev
+    env_file:
+      - .env.example
+    ports:
+      - '3000:3000'
+      - '5173:5173'
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules
+
+volumes:
+  node_modules:
