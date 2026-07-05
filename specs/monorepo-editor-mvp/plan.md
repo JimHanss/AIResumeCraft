@@ -2,8 +2,8 @@
 
 ## Affected Files and Modules
 
-- `pnpm-workspace.yaml`
-  - Keep current workspace support for `apps/*` and `packages/*`.
+- `package.json`
+  - Keep current Yarn workspace support for `apps/*` and `packages/*`.
   - Only change if the editor package is migrated from `apps/editor` to `packages/editor`.
 - `package.json`
   - Reuse existing root scripts for install, dev, lint, typecheck, test, and build.
@@ -206,23 +206,23 @@ Migration compatibility:
 Run after implementation:
 
 ```bash
-pnpm install
-pnpm lint
-pnpm typecheck
-pnpm test:unit
-pnpm build
+yarn install --immutable
+yarn lint
+yarn typecheck
+yarn test:unit
+yarn build
 ```
 
 Optional local browser validation:
 
 ```bash
-pnpm exec playwright install chromium
-pnpm test:e2e
+yarn playwright install chromium
+yarn test:e2e
 ```
 
 Manual smoke checks:
 
-- Start the editor with `pnpm dev:editor`.
+- Start the editor with `yarn dev:editor`.
 - Open `http://127.0.0.1:5173`.
 - Drag avatar, summary, experience, and skills modules from the material panel to the canvas.
 - Reorder modules on the canvas.

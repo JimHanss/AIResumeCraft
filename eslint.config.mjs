@@ -17,7 +17,4 @@ export default antfu({
     '**/storybook-static/**',
     '**/playwright-report/**',
   ],
-  rules: {
-    'pnpm/yaml-enforce-settings': 'off',
-  },
 })

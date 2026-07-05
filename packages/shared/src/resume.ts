@@ -15,6 +15,7 @@ export const resumeSectionTypeSchema = z.enum([
 export const resumeModuleTypeSchema = z.enum([
   'avatar',
   'summary',
+  'education',
   'experience',
   'skills',
 ])
@@ -49,6 +50,7 @@ export const avatarResumeModuleSchema = resumeModuleBaseSchema.extend({
     phone: z.string().optional(),
     location: z.string().optional(),
     avatarUrl: z.string().optional(),
+    profileUrl: z.string().optional(),
   }),
 })
 
@@ -67,9 +69,32 @@ export const experienceResumeModuleSchema = resumeModuleBaseSchema.extend({
         id: z.string().min(1),
         company: z.string(),
         role: z.string(),
+        location: z.string().optional(),
         startDate: z.string().optional(),
         endDate: z.string().optional(),
+        current: z.boolean().optional(),
         description: z.string(),
+      }),
+    ),
+  }),
+})
+
+export const educationResumeModuleSchema = resumeModuleBaseSchema.extend({
+  type: z.literal('education'),
+  content: z.object({
+    items: z.array(
+      z.object({
+        id: z.string().min(1),
+        school: z.string(),
+        degree: z.string(),
+        field: z.string(),
+        location: z.string().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        gpa: z.string().optional(),
+        honors: z.string().optional(),
+        coursework: z.string().optional(),
+        description: z.string().optional(),
       }),
     ),
   }),
@@ -78,13 +103,20 @@ export const experienceResumeModuleSchema = resumeModuleBaseSchema.extend({
 export const skillsResumeModuleSchema = resumeModuleBaseSchema.extend({
   type: z.literal('skills'),
   content: z.object({
-    skills: z.array(z.string()),
+    groups: z.array(
+      z.object({
+        id: z.string().min(1),
+        name: z.string(),
+        skills: z.array(z.string()),
+      }),
+    ),
   }),
 })
 
 export const resumeModuleSchema = z.discriminatedUnion('type', [
   avatarResumeModuleSchema,
   summaryResumeModuleSchema,
+  educationResumeModuleSchema,
   experienceResumeModuleSchema,
   skillsResumeModuleSchema,
 ])
@@ -115,7 +147,13 @@ export type SummaryResumeModule = z.infer<typeof summaryResumeModuleSchema>
 export type ExperienceResumeModule = z.infer<
   typeof experienceResumeModuleSchema
 >
+export type EducationResumeModule = z.infer<typeof educationResumeModuleSchema>
 export type SkillsResumeModule = z.infer<typeof skillsResumeModuleSchema>
+export type ExperienceResumeItem
+  = ExperienceResumeModule['content']['items'][number]
+export type EducationResumeItem
+  = EducationResumeModule['content']['items'][number]
+export type SkillGroup = SkillsResumeModule['content']['groups'][number]
 export type ResumeModule = z.infer<typeof resumeModuleSchema>
 export type ResumeModuleFor<T extends ResumeModuleType> = Extract<
   ResumeModule,

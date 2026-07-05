@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import type { ExperienceResumeModule } from '@airesumecraft/shared'
+import type {
+  ExperienceResumeItem,
+  ExperienceResumeModule,
+} from '@airesumecraft/shared'
 import { createExperienceItem } from '@airesumecraft/shared'
-import { NButton, NInput, NSpace } from 'naive-ui'
+import { NButton, NCheckbox, NInput, NSpace } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import FieldControl from '../forms/FieldControl.vue'
+import FieldGrid from '../forms/FieldGrid.vue'
 
 const props = defineProps<{
   module: ExperienceResumeModule
@@ -11,13 +17,17 @@ const emit = defineEmits<{
   update: [patch: Partial<ExperienceResumeModule['content']>]
 }>()
 
-type ExperienceItem = ExperienceResumeModule['content']['items'][number]
+const { t } = useI18n()
 
-function updateItems(items: ExperienceItem[]) {
+function updateItems(items: ExperienceResumeItem[]) {
   emit('update', { items })
 }
 
-function updateItem(id: string, field: keyof ExperienceItem, value: string) {
+function updateItem<K extends keyof ExperienceResumeItem>(
+  id: string,
+  field: K,
+  value: ExperienceResumeItem[K],
+) {
   updateItems(
     props.module.content.items.map(item =>
       item.id === id
@@ -48,48 +58,81 @@ function removeItem(id: string) {
       class="experience-item"
     >
       <NSpace vertical :size="8">
-        <NInput
-          :value="item.company"
-          placeholder="Company"
-          @update:value="(value) => updateItem(item.id, 'company', value)"
-        />
-        <NInput
-          :value="item.role"
-          placeholder="Role"
-          @update:value="(value) => updateItem(item.id, 'role', value)"
-        />
-        <NSpace :wrap="false">
+        <FieldGrid>
+          <FieldControl :label="t('editor.fields.company')">
+            <NInput
+              :value="item.company"
+              :placeholder="t('editor.fields.company')"
+              @update:value="(value) => updateItem(item.id, 'company', value)"
+            />
+          </FieldControl>
+
+          <FieldControl :label="t('editor.fields.role')">
+            <NInput
+              :value="item.role"
+              :placeholder="t('editor.fields.role')"
+              @update:value="(value) => updateItem(item.id, 'role', value)"
+            />
+          </FieldControl>
+
+          <FieldControl :label="t('editor.fields.location')">
+            <NInput
+              :value="item.location"
+              :placeholder="t('editor.fields.location')"
+              @update:value="(value) => updateItem(item.id, 'location', value)"
+            />
+          </FieldControl>
+
+          <FieldControl :label="t('editor.fields.startDate')">
+            <NInput
+              :value="item.startDate"
+              :placeholder="t('editor.fields.startDate')"
+              @update:value="(value) => updateItem(item.id, 'startDate', value)"
+            />
+          </FieldControl>
+
+          <FieldControl :label="t('editor.fields.endDate')">
+            <NInput
+              :disabled="item.current"
+              :value="item.endDate"
+              :placeholder="t('editor.fields.endDate')"
+              @update:value="(value) => updateItem(item.id, 'endDate', value)"
+            />
+          </FieldControl>
+
+          <FieldControl :label="t('editor.fields.currentRole')">
+            <NCheckbox
+              :checked="item.current"
+              @update:checked="(value) => updateItem(item.id, 'current', value)"
+            >
+              {{ t('editor.fields.currentRole') }}
+            </NCheckbox>
+          </FieldControl>
+        </FieldGrid>
+
+        <FieldControl :label="t('editor.fields.experienceDescription')">
           <NInput
-            :value="item.startDate"
-            placeholder="Start"
-            @update:value="(value) => updateItem(item.id, 'startDate', value)"
+            type="textarea"
+            :value="item.description"
+            :placeholder="t('editor.fields.experienceDescription')"
+            :autosize="{ minRows: 3, maxRows: 6 }"
+            @update:value="(value) => updateItem(item.id, 'description', value)"
           />
-          <NInput
-            :value="item.endDate"
-            placeholder="End"
-            @update:value="(value) => updateItem(item.id, 'endDate', value)"
-          />
-        </NSpace>
-        <NInput
-          type="textarea"
-          :value="item.description"
-          placeholder="Impact, scope, and measurable results"
-          :autosize="{ minRows: 3, maxRows: 6 }"
-          @update:value="(value) => updateItem(item.id, 'description', value)"
-        />
+        </FieldControl>
+
         <NButton
           quaternary
           type="error"
           size="small"
           @click="removeItem(item.id)"
         >
-          Remove experience
+          {{ t('editor.actions.removeExperience') }}
         </NButton>
       </NSpace>
     </section>
 
     <NButton secondary type="primary" @click="addItem">
-      Add experience
+      {{ t('editor.actions.addExperience') }}
     </NButton>
   </NSpace>
 </template>

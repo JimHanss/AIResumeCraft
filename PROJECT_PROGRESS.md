@@ -2,9 +2,43 @@
 
 ## Current Status
 
-The Monorepo Editor MVP is verified and complete. The repository now has a local-first, no-AI Vue editor with typed shared resume modules, Pinia persistence, MSW mock data, drag-and-drop canvas editing, unit coverage, and Chromium E2E coverage.
+The Monorepo Editor MVP and resume editor core enhancements are verified, documented, and complete. The repository now has a local-first, no-AI Vue editor with typed shared resume modules, Pinia persistence, MSW mock data, drag-and-drop canvas editing, right-side preview reordering, unit coverage, and Chromium E2E coverage.
 
 ## Completed Features
+
+### Resume Editor Core Enhancements
+
+Status: Completed
+Spec: `specs/resume-editor-core-enhancements/spec.md`
+Tasks: `specs/resume-editor-core-enhancements/tasks.md`
+Verify: `specs/resume-editor-core-enhancements/verify.md`
+
+Summary:
+
+- Added an education resume module with school, degree, field of study, location, dates, GPA, honors, coursework, and description fields.
+- Migrated core editor modules to reusable title-and-input field components.
+- Expanded avatar and experience data with profile URL, location, and current-role semantics.
+- Replaced flat skills with grouped skill editing and migration from old flat skill payloads.
+- Replaced the middle editor drag affordance with a clearer four-direction move icon.
+- Added right-side preview module reordering that writes back to the same Pinia store as the middle editor.
+- Updated preview rendering for education, grouped skills, profile links, current roles, and separator-safe optional fields.
+- Added migration coverage so compatible old localStorage documents are upgraded before schema validation.
+
+Validation:
+
+- `corepack yarn lint`: passed.
+- `corepack yarn typecheck`: passed.
+- `corepack yarn test:unit`: passed, editor 7 tests and shared 9 tests.
+- `corepack yarn test:e2e`: passed, Chromium 3 tests.
+- `corepack yarn build`: passed.
+- `git diff --check`: passed.
+- Browser smoke at 1872x1009 and 390x844: passed with no body horizontal overflow, reachable preview drag handles, and no actionable console errors.
+
+Changed Areas:
+
+- `packages/shared`: resume schemas, education/grouped skill helpers, migration utilities, fixtures, and shared tests.
+- `apps/editor`: field components, module editors, module registry, material panel, preview reorder flow, i18n, styles, store tests, and E2E tests.
+- Project docs and workflow files: `README.md`, `.gitignore`, `PROJECT_PROGRESS.md`, `CODE_MAP.md`, and `specs/resume-editor-core-enhancements/*`.
 
 ### Monorepo Editor MVP
 
@@ -25,12 +59,12 @@ Summary:
 
 Validation:
 
-- `pnpm install --frozen-lockfile`: passed.
-- `pnpm lint`: passed after `pnpm lint:fix` applied mechanical style fixes.
-- `pnpm typecheck`: passed.
-- `pnpm test:unit`: passed, 9 tests.
-- `pnpm build`: passed.
-- `pnpm test:e2e`: passed in Chromium, 2 tests.
+- `yarn install --immutable`: passed.
+- `yarn lint`: passed after mechanical style fixes.
+- `yarn typecheck`: passed.
+- `yarn test:unit`: passed, 9 tests.
+- `yarn build`: passed.
+- `yarn test:e2e`: passed in Chromium, 2 tests.
 - `git diff --check`: passed.
 
 Changed Areas:
@@ -43,8 +77,8 @@ Changed Areas:
 ## In Progress
 
 - Feature: None.
-- Current phase: Documentation and hygiene complete for `monorepo-editor-mvp`.
-- Next step: Commit the verification/doc hygiene updates when ready.
+- Current phase: Documentation and hygiene complete for `resume-editor-core-enhancements`.
+- Next step: Review and commit the completed feature changes when ready.
 
 ## Known Risks
 
@@ -52,7 +86,7 @@ Changed Areas:
   Mitigation: Consider code-splitting chart code before production release gating.
 - Risk: The portfolio build still emits Nuxt/Nitro dependency and Node deprecation warnings.
   Mitigation: Track during Nuxt/Nitro dependency updates.
-- Risk: `pnpm lint` emits a Node experimental ESM/CJS warning from ESLint tooling.
+- Risk: `yarn lint` emits a Node experimental ESM/CJS warning from ESLint tooling.
   Mitigation: Treat as non-blocking unless future Node/tooling versions turn it into a failure.
 - Risk: E2E can emit a non-fatal Vite ResizeObserver notification during drag-heavy tests.
   Mitigation: Current Playwright assertions pass; revisit only if it becomes test-failing noise.

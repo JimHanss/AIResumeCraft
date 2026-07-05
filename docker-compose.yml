@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: .
-    command: pnpm dev
+    command: yarn dev
     env_file:
       - .env.example
     ports:

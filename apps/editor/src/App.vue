@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import type { GlobalThemeOverrides } from 'naive-ui'
 import {
   darkTheme,
+  dateEnUS,
+  dateZhCN,
+  enUS,
   NButton,
   NConfigProvider,
   NLayout,
@@ -9,8 +13,9 @@ import {
   NMessageProvider,
   NSelect,
   NSpace,
+  zhCN,
 } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterView } from 'vue-router'
 import { useResumeStore } from './stores/resume'
@@ -23,6 +28,15 @@ const localeOptions = [
   { label: 'English', value: 'en-US' },
 ]
 
+watch(
+  () => store.document.locale,
+  (value) => {
+    if (locale.value !== value)
+      locale.value = value
+  },
+  { immediate: true },
+)
+
 const selectedLocale = computed({
   get: () => locale.value,
   set: (value: string) => {
@@ -30,10 +44,82 @@ const selectedLocale = computed({
     store.setLocale(value as 'zh-CN' | 'en-US')
   },
 })
+
+const lightThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    baseColor: '#ffffff',
+    bodyColor: '#eff6ff',
+    cardColor: '#ffffff',
+    popoverColor: '#ffffff',
+    modalColor: '#ffffff',
+    primaryColor: '#3b82f6',
+    primaryColorHover: '#60a5fa',
+    primaryColorPressed: '#2563eb',
+    primaryColorSuppl: '#93c5fd',
+    infoColor: '#0ea5e9',
+    infoColorHover: '#38bdf8',
+    infoColorPressed: '#0284c7',
+    infoColorSuppl: '#7dd3fc',
+    borderColor: '#bfdbfe',
+    dividerColor: '#dbeafe',
+    hoverColor: '#eff6ff',
+    pressedColor: '#dbeafe',
+    textColor1: '#102033',
+    textColor2: '#334155',
+    textColor3: '#64748b',
+    placeholderColor: '#7c8da5',
+    borderRadius: '8px',
+    borderRadiusSmall: '6px',
+  },
+}
+
+const darkThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    baseColor: '#0b1220',
+    bodyColor: '#08111f',
+    cardColor: '#0f1b2d',
+    popoverColor: '#0f1b2d',
+    modalColor: '#0f1b2d',
+    primaryColor: '#60a5fa',
+    primaryColorHover: '#93c5fd',
+    primaryColorPressed: '#3b82f6',
+    primaryColorSuppl: '#bfdbfe',
+    infoColor: '#38bdf8',
+    infoColorHover: '#7dd3fc',
+    infoColorPressed: '#0ea5e9',
+    infoColorSuppl: '#bae6fd',
+    borderColor: '#1e3a5f',
+    dividerColor: '#1d3557',
+    hoverColor: '#10233b',
+    pressedColor: '#17365d',
+    textColor1: '#f8fbff',
+    textColor2: '#dbeafe',
+    textColor3: '#9fb9d9',
+    placeholderColor: '#7d93b4',
+    borderRadius: '8px',
+    borderRadiusSmall: '6px',
+  },
+}
+
+const activeThemeOverrides = computed(() =>
+  store.preferences.darkMode ? darkThemeOverrides : lightThemeOverrides,
+)
+
+const activeNaiveLocale = computed(() =>
+  locale.value === 'zh-CN' ? zhCN : enUS,
+)
+const activeNaiveDateLocale = computed(() =>
+  locale.value === 'zh-CN' ? dateZhCN : dateEnUS,
+)
 </script>
 
 <template>
-  <NConfigProvider :theme="store.preferences.darkMode ? darkTheme : null">
+  <NConfigProvider
+    :date-locale="activeNaiveDateLocale"
+    :locale="activeNaiveLocale"
+    :theme="store.preferences.darkMode ? darkTheme : null"
+    :theme-overrides="activeThemeOverrides"
+  >
     <NMessageProvider>
       <NLayout
         class="app-shell"

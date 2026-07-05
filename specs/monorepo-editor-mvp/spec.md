@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build the local-first foundation for a resume editor MVP: a pnpm monorepo with a Vue 3 visual editor, shared resume data contracts, draggable resume modules, editable canvas rendering, local persistence, mocked API data, and passing unit tests. The milestone is a fully runnable resume editor without AI capabilities.
+Build the local-first foundation for a resume editor MVP: a Yarn monorepo with a Vue 3 visual editor, shared resume data contracts, draggable resume modules, editable canvas rendering, local persistence, mocked API data, and passing unit tests. The milestone is a fully runnable resume editor without AI capabilities.
 
 ## Users
 
@@ -21,7 +21,7 @@ Build the local-first foundation for a resume editor MVP: a pnpm monorepo with a
 
 ## In Scope
 
-- pnpm workspace foundation with an editor package and shared package.
+- Yarn workspace foundation with an editor package and shared package.
 - Vue 3 + Vite + TypeScript editor application.
 - Naive UI integration for the editor UI.
 - Shared resume data structures for profile/basic information and ordered module arrays.
@@ -46,7 +46,7 @@ Build the local-first foundation for a resume editor MVP: a pnpm monorepo with a
 
 ## Acceptance Criteria
 
-- The project installs with pnpm and exposes runnable editor scripts.
+- The project installs with Yarn and exposes runnable editor scripts.
 - The editor can be launched locally and displays a visual resume editing workspace.
 - The left material panel exposes avatar, summary, experience, and skills module entries.
 - A user can drag a module into the canvas.

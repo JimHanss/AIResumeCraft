@@ -4,7 +4,7 @@ Last verified: 2026-07-05
 
 ## Acceptance Criteria
 
-- Project installs with pnpm and exposes runnable editor scripts: Passed.
+- Project installs with Yarn and exposes runnable editor scripts: Passed.
 - Editor launches locally and displays the visual resume editing workspace: Passed.
 - Material panel exposes avatar, summary, experience, and skills entries: Passed.
 - User can drag modules into the canvas: Passed.
@@ -20,14 +20,14 @@ Last verified: 2026-07-05
 
 ## Commands Run
 
-- `pnpm install --frozen-lockfile`: passed, workspace already up to date.
-- `pnpm lint`: initially failed on fixable style issues after formatting.
-- `pnpm lint:fix`: passed and applied mechanical ESLint style fixes.
-- `pnpm lint`: passed after auto-fix, with a Node ESM/CJS experimental warning from ESLint tooling.
-- `pnpm typecheck`: passed for `packages/shared`, `apps/editor`, and `apps/portfolio`.
-- `pnpm test:unit`: passed, shared 5 tests and editor store 4 tests.
-- `pnpm build`: passed, with existing editor chunk-size and Nuxt/Nitro warnings.
-- `pnpm test:e2e`: passed in Chromium, 2 tests.
+- `yarn install --immutable`: passed, workspace already up to date.
+- `yarn lint`: initially failed on fixable style issues after formatting.
+- `yarn lint:fix`: passed and applied mechanical ESLint style fixes.
+- `yarn lint`: passed after auto-fix, with a Node ESM/CJS experimental warning from ESLint tooling.
+- `yarn typecheck`: passed for `packages/shared`, `apps/editor`, and `apps/portfolio`.
+- `yarn test:unit`: passed, shared 5 tests and editor store 4 tests.
+- `yarn build`: passed, with existing editor chunk-size and Nuxt/Nitro warnings.
+- `yarn test:e2e`: passed in Chromium, 2 tests.
 - `git diff --check`: passed.
 
 ## Command Output Summary

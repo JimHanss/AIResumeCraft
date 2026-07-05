@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    color: #18202f;
+    color: #102033;
     font-family:
       Inter,
       ui-sans-serif,
@@ -17,6 +17,6 @@
 
   body {
     margin: 0;
-    background: #f7f8fb;
+    background: #eff6ff;
   }
 }

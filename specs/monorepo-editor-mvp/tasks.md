@@ -9,7 +9,7 @@
 ## Workspace and Housekeeping
 
 - [x] T004 Check `.gitignore` for generated artifacts from the MVP workflow, including editor build output, test output, Playwright output, `.nuxt`, `.output`, `dist`, and `*.tsbuildinfo`.
-- [x] T005 If `packages/editor` is required, migrate `apps/editor` to `packages/editor` and update `pnpm-workspace.yaml`, root scripts, Playwright config, README paths, and package filters. Not applicable after T001.
+- [x] T005 If `packages/editor` is required, migrate `apps/editor` to `packages/editor` and update Yarn workspace config, root scripts, Playwright config, README paths, and package filters. Not applicable after T001.
 - [x] T006 If `apps/editor` is kept, document that decision in `PROJECT_PROGRESS.md` and leave workspace scripts unchanged unless needed for MVP commands.
 
 ## Shared Resume Model
@@ -69,12 +69,12 @@
 
 ## Verification
 
-- [x] T044 Run `pnpm install` and verify dependency state is clean.
-- [x] T045 Run `pnpm lint` and fix lint issues.
-- [x] T046 Run `pnpm typecheck` and fix type issues.
-- [x] T047 Run `pnpm test:unit` and fix unit test failures.
-- [x] T048 Run `pnpm build` and fix build failures.
-- [x] T049 Optionally run `pnpm exec playwright install chromium` then `pnpm test:e2e` when the browser download is available. Completed with Chromium installed through the Playwright mirror fallback and `pnpm test:e2e` passing.
+- [x] T044 Run `yarn install --immutable` and verify dependency state is clean.
+- [x] T045 Run `yarn lint` and fix lint issues.
+- [x] T046 Run `yarn typecheck` and fix type issues.
+- [x] T047 Run `yarn test:unit` and fix unit test failures.
+- [x] T048 Run `yarn build` and fix build failures.
+- [x] T049 Optionally run `yarn playwright install chromium` then `yarn test:e2e` when the browser download is available. Completed with Chromium installed through the Playwright mirror fallback and `yarn test:e2e` passing.
 - [x] T050 Manually smoke test the editor: drag each module type into the canvas, reorder modules, edit content, refresh, and confirm localStorage restore. Covered by Playwright Chromium E2E: all four material types drag into the canvas, modules reorder, edited name persists after refresh.
 
 ## Completion

@@ -14,16 +14,16 @@ useSeoMeta({
   <main class="mx-auto max-w-4xl px-5 py-8 md:py-12">
     <NuxtLink
       to="/"
-      class="text-sm font-medium text-cyan-700 hover:text-cyan-900"
+      class="text-sm font-medium text-blue-700 transition-colors hover:text-blue-900"
     >
       Back
     </NuxtLink>
 
     <article
-      class="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:p-10"
+      class="mt-6 rounded-lg border border-blue-100 bg-white/95 p-6 shadow-sm shadow-blue-900/5 md:p-10"
     >
-      <header class="border-b border-slate-200 pb-6">
-        <p class="text-sm text-slate-500">
+      <header class="border-b border-blue-100 pb-6">
+        <p class="text-sm text-blue-500">
           /resume/{{ slug }}
         </p>
         <h1 class="mt-3 text-4xl font-semibold tracking-normal text-slate-950">
@@ -40,7 +40,7 @@ useSeoMeta({
       <section
         v-for="section in demoResume.sections"
         :key="section.id"
-        class="border-b border-slate-100 py-6 last:border-0"
+        class="border-b border-blue-50 py-6 last:border-0"
       >
         <h2 class="text-base font-semibold text-slate-950">
           {{ section.title }}

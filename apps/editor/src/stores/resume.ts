@@ -23,30 +23,23 @@ const persistenceKey = 'airesumecraft:resume-editor'
 
 export interface ResumeModuleMaterial {
   type: ResumeModuleType
-  title: string
-  description: string
 }
 
 const materialDefinitions: ResumeModuleMaterial[] = [
   {
     type: 'avatar',
-    title: 'Basic Info',
-    description: 'Name, headline, contact, and avatar.',
   },
   {
     type: 'summary',
-    title: 'Summary',
-    description: 'A concise professional introduction.',
+  },
+  {
+    type: 'education',
   },
   {
     type: 'experience',
-    title: 'Experience',
-    description: 'Company, role, dates, and impact bullets.',
   },
   {
     type: 'skills',
-    title: 'Skills',
-    description: 'Keyword-friendly skill list.',
   },
 ]
 
@@ -68,6 +61,7 @@ export const useResumeStore = defineStore(
     const selectedModuleId = ref<string | undefined>(
       document.value.modules[0]?.id,
     )
+    const dragPreviewModuleIds = ref<string[]>([])
     const preferences = ref({
       darkMode: false,
     })
@@ -76,14 +70,44 @@ export const useResumeStore = defineStore(
       sortSections(document.value.sections),
     )
     const orderedModules = computed(() => sortModules(document.value.modules))
+    const previewOrderedModules = computed(() => {
+      if (dragPreviewModuleIds.value.length === 0)
+        return orderedModules.value
+
+      const modulesById = new Map(
+        orderedModules.value.map(module => [module.id, module]),
+      )
+      const seenModuleIds = new Set<string>()
+      const previewModules: ResumeModule[] = []
+
+      for (const moduleId of dragPreviewModuleIds.value) {
+        const module = modulesById.get(moduleId)
+        if (!module || seenModuleIds.has(module.id))
+          continue
+
+        seenModuleIds.add(module.id)
+        previewModules.push(module)
+      }
+
+      for (const module of orderedModules.value) {
+        if (!seenModuleIds.has(module.id))
+          previewModules.push(module)
+      }
+
+      return previewModules
+    })
     const selectedModule = computed(() =>
       document.value.modules.find(
         module => module.id === selectedModuleId.value,
       ),
     )
     const availableMaterials = computed(() => materialDefinitions)
+    const activeModuleTypes = computed(
+      () => new Set(document.value.modules.map(module => module.type)),
+    )
 
     function restoreDocument(input: unknown) {
+      clearDragPreviewModuleOrder()
       document.value = safeResumeDocument(input, demoResume)
       document.value.modules = normalizeModuleOrder(document.value.modules)
       document.value.sections = reorderSections(document.value.sections)
@@ -155,8 +179,55 @@ export const useResumeStore = defineStore(
       return module
     }
 
+    function addFirstInactiveModule() {
+      const inactiveMaterial = materialDefinitions.find(
+        material => !activeModuleTypes.value.has(material.type),
+      )
+      return addModule(inactiveMaterial?.type ?? 'summary')
+    }
+
     function reorderModules(modules: ResumeModule[]) {
+      clearDragPreviewModuleOrder()
       document.value.modules = normalizeModuleOrder(modules)
+    }
+
+    function setDragPreviewModuleOrder(moduleIds: string[]) {
+      const knownModuleIds = new Set(
+        orderedModules.value.map(module => module.id),
+      )
+      const nextModuleIds: string[] = []
+
+      for (const moduleId of moduleIds) {
+        if (knownModuleIds.has(moduleId) && !nextModuleIds.includes(moduleId))
+          nextModuleIds.push(moduleId)
+      }
+
+      dragPreviewModuleIds.value
+        = nextModuleIds.length === orderedModules.value.length
+          ? nextModuleIds
+          : []
+    }
+
+    function clearDragPreviewModuleOrder() {
+      dragPreviewModuleIds.value = []
+    }
+
+    function renameModule(id: string, title: string) {
+      const nextTitle = title.trim()
+      if (!nextTitle)
+        return false
+
+      const index = document.value.modules.findIndex(
+        module => module.id === id,
+      )
+      if (index === -1)
+        return false
+
+      document.value.modules[index] = {
+        ...document.value.modules[index],
+        title: nextTitle,
+      } as ResumeModule
+      return true
     }
 
     function updateModule(id: string, patch: Partial<ResumeModule['content']>) {
@@ -182,6 +253,7 @@ export const useResumeStore = defineStore(
     }
 
     function removeModule(id: string) {
+      clearDragPreviewModuleOrder()
       const nextModules = document.value.modules.filter(
         module => module.id !== id,
       )
@@ -189,6 +261,30 @@ export const useResumeStore = defineStore(
 
       if (selectedModuleId.value === id)
         selectedModuleId.value = document.value.modules[0]?.id
+    }
+
+    function removeModulesByType(type: ResumeModuleType) {
+      clearDragPreviewModuleOrder()
+      const removedSelectedModule = document.value.modules.some(
+        module =>
+          module.type === type && module.id === selectedModuleId.value,
+      )
+      document.value.modules = normalizeModuleOrder(
+        document.value.modules.filter(module => module.type !== type),
+      )
+
+      if (removedSelectedModule)
+        selectedModuleId.value = document.value.modules[0]?.id
+    }
+
+    function toggleModuleType(type: ResumeModuleType, enabled: boolean) {
+      if (enabled) {
+        if (!activeModuleTypes.value.has(type))
+          addModule(type)
+        return
+      }
+
+      removeModulesByType(type)
     }
 
     function duplicateModule(id: string) {
@@ -231,6 +327,8 @@ export const useResumeStore = defineStore(
     }
 
     return {
+      activeModuleTypes,
+      addFirstInactiveModule,
       addModule,
       availableMaterials,
       createModule,
@@ -239,19 +337,25 @@ export const useResumeStore = defineStore(
       loadInitialResume,
       orderedModules,
       orderedSections,
+      previewOrderedModules,
       preferences,
       removeModule,
       replaceSections,
+      removeModulesByType,
+      renameModule,
       resetResume,
       restoreDocument,
       reorderModules,
+      setDragPreviewModuleOrder,
       selectModule,
       selectedModule,
       selectedModuleId,
       setLocale,
       toggleTheme,
+      toggleModuleType,
       updateModule,
       updateSection,
+      clearDragPreviewModuleOrder,
     }
   },
   {

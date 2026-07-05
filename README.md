@@ -1,6 +1,6 @@
 # AIResumeCraft
 
-AIResumeCraft is a pnpm monorepo for a local-first resume editor MVP.
+AIResumeCraft is a Yarn monorepo for a local-first resume editor MVP.
 
 - `apps/editor`: Vue 3 + Vite + TypeScript visual resume editor.
 - `apps/portfolio`: Nuxt 3 SSG portfolio site and Nitro BFF API.
@@ -11,8 +11,9 @@ AIResumeCraft is a pnpm monorepo for a local-first resume editor MVP.
 The current editor milestone is intentionally no-AI. It supports:
 
 - draggable resume materials,
-- editable avatar, summary, experience, and skills modules,
+- editable avatar, summary, education, experience, and grouped skills modules,
 - dynamic module rendering on the canvas,
+- module reordering from both the middle editor and right-side preview,
 - Pinia state persisted to localStorage,
 - Axios data access with optional MSW mock responses.
 
@@ -21,22 +22,22 @@ The editor remains in `apps/editor`. The `packages/shared` package preserves leg
 ## Development
 
 ```bash
-pnpm install
-pnpm dev:editor
-pnpm dev:portfolio
+yarn install
+yarn dev:editor
+yarn dev:portfolio
 ```
 
 Enable browser-level mocks for the editor:
 
 ```bash
-VITE_ENABLE_MSW=true pnpm dev:editor
+VITE_ENABLE_MSW=true yarn dev:editor
 ```
 
 On Windows PowerShell:
 
 ```powershell
 $env:VITE_ENABLE_MSW = "true"
-pnpm dev:editor
+yarn dev:editor
 ```
 
 ## Reset Local Data
@@ -50,16 +51,16 @@ localStorage.removeItem('airesumecraft:resume-editor')
 ## Verification
 
 ```bash
-pnpm install
-pnpm lint
-pnpm typecheck
-pnpm test:unit
-pnpm build
+yarn install --immutable
+yarn lint
+yarn typecheck
+yarn test:unit
+yarn test:e2e
+yarn build
 ```
 
-Run E2E after installing Playwright browsers:
+If Playwright browsers are not installed yet:
 
 ```bash
-pnpm exec playwright install chromium
-pnpm test:e2e
+yarn playwright install chromium
 ```

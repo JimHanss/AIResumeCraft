@@ -5,16 +5,16 @@ const score = calculateOverallScore(demoResume)
 </script>
 
 <template>
-  <main class="min-h-screen">
+  <main class="min-h-screen bg-blue-50/70">
     <section
       class="mx-auto grid max-w-6xl gap-8 px-5 py-8 md:grid-cols-[1fr_360px] md:py-12"
     >
       <div
-        class="flex min-h-[68vh] flex-col justify-between rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+        class="flex min-h-[68vh] flex-col justify-between rounded-lg border border-blue-100 bg-white/95 p-6 shadow-sm shadow-blue-900/5 md:p-8"
       >
         <div>
           <p
-            class="text-sm font-medium uppercase tracking-[0.12em] text-cyan-700"
+            class="text-sm font-medium uppercase tracking-[0.12em] text-blue-700"
           >
             Featured Resume
           </p>
@@ -32,7 +32,7 @@ const score = calculateOverallScore(demoResume)
           <div
             v-for="section in demoResume.sections.slice(0, 3)"
             :key="section.id"
-            class="rounded-md border border-slate-200 p-4"
+            class="rounded-md border border-blue-100 bg-blue-50/40 p-4"
           >
             <h2 class="text-sm font-semibold text-slate-900">
               {{ section.title }}
@@ -45,9 +45,9 @@ const score = calculateOverallScore(demoResume)
       </div>
 
       <aside
-        class="rounded-lg border border-slate-200 bg-slate-950 p-6 text-white shadow-sm"
+        class="rounded-lg border border-blue-500 bg-blue-600 p-6 text-white shadow-sm shadow-blue-900/10"
       >
-        <p class="text-sm text-cyan-200">
+        <p class="text-sm text-blue-100">
           Resume score
         </p>
         <strong class="mt-3 block text-6xl tracking-normal">{{ score }}</strong>
@@ -55,9 +55,9 @@ const score = calculateOverallScore(demoResume)
           <div
             v-for="[name, value] in Object.entries(demoResume.score)"
             :key="name"
-            class="flex items-center justify-between border-b border-white/10 pb-3"
+            class="flex items-center justify-between border-b border-white/15 pb-3"
           >
-            <dt class="capitalize text-slate-300">
+            <dt class="capitalize text-blue-100">
               {{ name }}
             </dt>
             <dd class="font-semibold">
@@ -67,7 +67,7 @@ const score = calculateOverallScore(demoResume)
         </dl>
         <NuxtLink
           to="/resume/demo"
-          class="mt-8 inline-flex h-10 items-center rounded-md bg-cyan-300 px-4 text-sm font-semibold text-slate-950 hover:bg-cyan-200"
+          class="mt-8 inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50"
         >
           View portfolio page
         </NuxtLink>

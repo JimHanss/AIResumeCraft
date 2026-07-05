@@ -51,6 +51,22 @@ describe('resume utilities', () => {
     expect(first.id).not.toBe(second.id)
   })
 
+  it('creates an education module with a default item', () => {
+    const module = createResumeModule('education')
+
+    expect(module.type).toBe('education')
+    expect(module.content.items).toHaveLength(1)
+    expect(module.content.items[0].school).toBe('')
+  })
+
+  it('creates grouped skills by default', () => {
+    const module = createResumeModule('skills')
+
+    expect(module.type).toBe('skills')
+    expect(module.content.groups).toHaveLength(1)
+    expect(module.content.groups[0].skills).toEqual([''])
+  })
+
   it('normalizes module order', () => {
     const modules = reorderModules([
       { ...createResumeModule('summary'), order: 10 },
@@ -58,6 +74,90 @@ describe('resume utilities', () => {
     ])
 
     expect(modules.map(module => module.order)).toEqual([1, 2])
+  })
+
+  it('migrates legacy flat skills into grouped skills', () => {
+    const legacy = structuredClone(demoResume) as unknown as {
+      modules: Array<{
+        type?: unknown
+        content?: Record<string, unknown>
+      }>
+    }
+    const skills = legacy.modules.find(module => module.type === 'skills')
+
+    expect(skills).toBeDefined()
+    skills!.content = {
+      skills: ['Vue', 'Testing'],
+    }
+
+    const migrated = safeResumeDocument(legacy, demoResume)
+    const migratedSkills = migrated.modules.find(
+      module => module.type === 'skills',
+    )
+
+    expect(migratedSkills?.type).toBe('skills')
+    if (migratedSkills?.type === 'skills') {
+      expect(migratedSkills.content.groups[0].name).toBe('Core Skills')
+      expect(migratedSkills.content.groups[0].skills).toEqual([
+        'Vue',
+        'Testing',
+      ])
+    }
+  })
+
+  it('migrates defaults for legacy avatar and experience modules', () => {
+    const legacy = structuredClone(demoResume) as unknown as {
+      modules: Array<{
+        type?: unknown
+        content?: Record<string, unknown>
+      }>
+    }
+    const avatar = legacy.modules.find(module => module.type === 'avatar')
+    const experience = legacy.modules.find(
+      module => module.type === 'experience',
+    )
+
+    expect(avatar).toBeDefined()
+    expect(experience).toBeDefined()
+
+    avatar!.content = {
+      name: 'Legacy User',
+      headline: 'Legacy Headline',
+      email: 'legacy@example.com',
+      phone: '',
+      location: 'Shanghai',
+      avatarUrl: '',
+    }
+    experience!.content = {
+      items: [
+        {
+          id: 'legacy-experience',
+          company: 'Legacy Co',
+          role: 'Engineer',
+          startDate: '2020',
+          endDate: 'Present',
+          description: 'Built migration coverage.',
+        },
+      ],
+    }
+
+    const migrated = safeResumeDocument(legacy, demoResume)
+    const migratedAvatar = migrated.modules.find(
+      module => module.type === 'avatar',
+    )
+    const migratedExperience = migrated.modules.find(
+      module => module.type === 'experience',
+    )
+
+    expect(migratedAvatar?.type).toBe('avatar')
+    if (migratedAvatar?.type === 'avatar')
+      expect(migratedAvatar.content.profileUrl).toBe('')
+
+    expect(migratedExperience?.type).toBe('experience')
+    if (migratedExperience?.type === 'experience') {
+      expect(migratedExperience.content.items[0].location).toBe('')
+      expect(migratedExperience.content.items[0].current).toBe(true)
+    }
   })
 
   it('falls back for invalid resume documents', () => {

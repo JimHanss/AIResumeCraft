@@ -5,7 +5,23 @@
 - `apps/editor`: Vue 3 + Vite resume editor SPA.
 - `apps/portfolio`: Nuxt 3 portfolio site and BFF routes.
 - `packages/shared`: shared schemas, fixtures, API constants, and pure utilities.
+- `specs/resume-editor-core-enhancements`: Spec workflow documents for the completed editor core enhancement.
 - `tests/e2e`: Playwright browser coverage for the editor.
+
+## Spec Workflow Documents
+
+### Resume Editor Core Enhancements
+
+Paths:
+
+- `specs/resume-editor-core-enhancements/spec.md`
+- `specs/resume-editor-core-enhancements/plan.md`
+- `specs/resume-editor-core-enhancements/tasks.md`
+- `specs/resume-editor-core-enhancements/verify.md`
+
+Purpose:
+
+- Records the accepted scope, technical plan, completed task checklist, verification evidence, known risks, and follow-up notes for the education module, grouped skills, unified field controls, and preview reorder feature.
 
 ## Pages / Screens
 
@@ -71,7 +87,7 @@ Path:
 
 Purpose:
 
-- Shows avatar, summary, experience, and skills materials and supports drag cloning into the canvas.
+- Shows avatar, summary, education, experience, and skills materials with local SVG icons and supports drag cloning into the canvas.
 
 Functions:
 
@@ -102,7 +118,12 @@ Path:
 
 Purpose:
 
-- Provides shared module chrome: selection state, drag handle, duplicate, and remove controls.
+- Provides shared module chrome: selection state, independent expansion, title drag handle, rename modal, and remove controls.
+
+Functions:
+
+- `openRenameModal`: Opens the module title edit dialog with the current display title.
+- `confirmRename`: Emits a trimmed title when the rename dialog is saved.
 
 ### Resume Score Radar
 
@@ -118,6 +139,34 @@ Functions:
 
 - `renderChart`: Initializes or updates the ECharts radar instance from the current score props.
 
+### Resume Preview
+
+Path:
+
+- `apps/editor/src/components/ResumePreview.vue`
+
+Purpose:
+
+- Renders the right-side resume preview, labeled template controls, and whole-section `vuedraggable` body-module ordering synced with the Pinia store.
+
+Functions:
+
+- `bodyModules`: Adapts non-avatar modules to a writable preview ordering model.
+- `startPreviewDrag`: Starts preview drag state and suppresses accidental text selection.
+- `moduleTitle`: Reads a custom module title with a localized type-title fallback.
+- `dateRange`, `textBullets`, `educationDetails`, and `skillItems`: Format preview-safe display values without dangling separators.
+
+### Field Components
+
+Paths:
+
+- `apps/editor/src/components/forms/FieldControl.vue`
+- `apps/editor/src/components/forms/FieldGrid.vue`
+
+Purpose:
+
+- Provide reusable title-and-input layout primitives for editor module forms.
+
 ## Editor Module Components
 
 ### Avatar Module
@@ -128,7 +177,7 @@ Path:
 
 Purpose:
 
-- Edits basic profile fields: name, headline, email, phone, location, and avatar URL.
+- Edits basic profile fields: name, headline, email, phone, location, profile URL, and avatar URL.
 
 Functions:
 
@@ -152,7 +201,7 @@ Path:
 
 Purpose:
 
-- Edits repeatable experience entries with company, role, dates, and description.
+- Edits repeatable experience entries with company, role, location, dates, current-role state, and description.
 
 Functions:
 
@@ -160,6 +209,23 @@ Functions:
 - `updateItem`: Updates one field on one experience item.
 - `addItem`: Appends a new blank experience item.
 - `removeItem`: Removes an experience item by id.
+
+### Education Module
+
+Path:
+
+- `apps/editor/src/components/modules/EducationModule.vue`
+
+Purpose:
+
+- Edits repeatable education entries with school, degree, field of study, location, dates, GPA, honors, coursework, and description.
+
+Functions:
+
+- `updateItems`: Emits the full next education item array.
+- `updateItem`: Updates one field on one education item.
+- `addItem`: Appends a new blank education item.
+- `removeItem`: Removes an education item by id.
 
 ### Skills Module
 
@@ -169,11 +235,15 @@ Path:
 
 Purpose:
 
-- Edits the resume skill list.
+- Edits grouped resume skills with named groups and repeatable skill items.
 
 Functions:
 
-- `updateSkills`: Emits the next skill array.
+- `withFallbackGroup`: Ensures the module never persists zero skill groups.
+- `updateGroups`: Emits the next skill group array.
+- `updateGroup`: Updates one skill group.
+- `addGroup` and `removeGroup`: Add or remove skill groups.
+- `updateSkill`, `addSkill`, and `removeSkill`: Mutate skill items inside a group.
 
 ### Unsupported Module
 
@@ -225,6 +295,7 @@ Functions:
 - `updateModule`: Patches one module content object and syncs avatar fields to profile data.
 - `removeModule`: Deletes one module and repairs selection if needed.
 - `duplicateModule`: Clones a module, inserts it after the original, and selects the clone.
+- `renameModule`: Updates one module title and rejects blank titles.
 - `resetResume`: Restores the deterministic demo resume.
 - `selectModule`: Sets the active module id.
 - `setLocale`: Updates the resume document locale.
@@ -351,6 +422,7 @@ Exports:
 - `resumeSectionSchema`: Validates legacy markdown section data.
 - `avatarResumeModuleSchema`: Validates editable avatar module content.
 - `summaryResumeModuleSchema`: Validates editable summary module content.
+- `educationResumeModuleSchema`: Validates editable education module content.
 - `experienceResumeModuleSchema`: Validates editable experience module content.
 - `skillsResumeModuleSchema`: Validates editable skills module content.
 - `resumeModuleSchema`: Validates any discriminated resume module.
@@ -405,7 +477,9 @@ Functions:
 - `createResumeModule`: Builds default content for one module type.
 - `cloneResumeModule`: Deep-clones a module with a fresh id.
 - `createExperienceItem`: Builds a blank experience item.
-- `safeResumeDocument`: Parses unknown input and falls back to a known-good resume.
+- `createEducationItem`: Builds a blank education item.
+- `createSkillGroup`: Builds a blank grouped skills item.
+- `safeResumeDocument`: Migrates compatible old module payloads, parses unknown input, and falls back to a known-good resume.
 - `calculateOverallScore`: Reads the overall score with a safe zero fallback.
 
 ## Tests
@@ -419,7 +493,7 @@ Paths:
 
 Purpose:
 
-- Cover module creation, unique ids, reorder normalization, update isolation, safe restore, and shared utility behavior.
+- Cover module creation, education and grouped skills behavior, migration defaults, unique ids, reorder normalization, update isolation, safe restore, and shared utility behavior.
 
 ### Editor E2E
 
@@ -429,7 +503,7 @@ Path:
 
 Purpose:
 
-- Verifies editor loading, material drag-in for all module types, module reorder, editing, and localStorage refresh restore in Chromium.
+- Verifies editor loading, local SVG material icons, sticky header behavior, material drag-in for all module types, independent expansion, module title editing, middle and preview module reorder, education editing, grouped skill editing, and localStorage refresh restore in Chromium.
 
 Functions:
 
@@ -439,11 +513,13 @@ Functions:
 ## Validation
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test:unit
-pnpm build
-pnpm test:e2e
+corepack yarn install --immutable
+corepack yarn lint
+corepack yarn typecheck
+corepack yarn test:unit
+corepack yarn test:e2e
+corepack yarn build
 git diff --check
 ```
+
+Manual browser smoke checks for feature verification are recorded in `specs/resume-editor-core-enhancements/verify.md`.

@@ -1,7 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'pnpm --filter @airesumecraft/portfolio preview',
+      startServerCommand: 'yarn workspace @airesumecraft/portfolio preview',
       url: ['http://localhost:3000'],
       numberOfRuns: 1,
     },
