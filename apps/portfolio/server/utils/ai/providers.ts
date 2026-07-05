@@ -60,19 +60,21 @@ export async function createResumeDraft(
     }),
   })
 
-  if (!response.ok)
+  if (!response.ok) {
     throw createError({
       statusCode: response.status,
       statusMessage: 'AI provider request failed',
     })
+  }
 
   const result = await response.json()
   const content = result.choices?.[0]?.message?.content
-  if (!content)
+  if (!content) {
     throw createError({
       statusCode: 502,
       statusMessage: 'AI provider returned an empty response',
     })
+  }
 
   return JSON.parse(content) as ResumeGenerationResponse
 }

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { calculateOverallScore, reorderSections } from './utils'
+import { demoResume } from './fixtures'
+import {
+  calculateOverallScore,
+  createResumeModule,
+  reorderModules,
+  reorderSections,
+  safeResumeDocument,
+} from './utils'
 
 describe('resume utilities', () => {
   it('normalizes section order', () => {
@@ -34,5 +41,28 @@ describe('resume utilities', () => {
         },
       }),
     ).toBe(85)
+  })
+
+  it('creates distinct resume modules', () => {
+    const first = createResumeModule('summary')
+    const second = createResumeModule('summary')
+
+    expect(first.type).toBe('summary')
+    expect(first.id).not.toBe(second.id)
+  })
+
+  it('normalizes module order', () => {
+    const modules = reorderModules([
+      { ...createResumeModule('summary'), order: 10 },
+      { ...createResumeModule('skills'), order: 4 },
+    ])
+
+    expect(modules.map((module) => module.order)).toEqual([1, 2])
+  })
+
+  it('falls back for invalid resume documents', () => {
+    expect(safeResumeDocument({ invalid: true }, demoResume)).toEqual(
+      demoResume,
+    )
   })
 })

@@ -4,32 +4,91 @@ export const demoResume: ResumeDocument = {
   id: 'demo-resume',
   locale: 'zh-CN',
   profile: {
-    name: '林一诺',
-    headline: 'AI 产品经理 / 全栈原型工程师',
+    name: 'Lin Yinuo',
+    headline: 'AI Product Manager / Prototype Engineer',
     email: 'lin@example.com',
     location: 'Shanghai',
   },
+  modules: [
+    {
+      id: 'module-avatar',
+      type: 'avatar',
+      title: 'Basic Info',
+      order: 1,
+      content: {
+        name: 'Lin Yinuo',
+        headline: 'AI Product Manager / Prototype Engineer',
+        email: 'lin@example.com',
+        phone: '+86 138 0000 0000',
+        location: 'Shanghai',
+        avatarUrl: '',
+      },
+    },
+    {
+      id: 'module-summary',
+      type: 'summary',
+      title: 'Summary',
+      order: 2,
+      content: {
+        text: '6 years of AI product and growth tooling experience, focused on turning LLM capabilities into measurable workflows.',
+      },
+    },
+    {
+      id: 'module-experience',
+      type: 'experience',
+      title: 'Experience',
+      order: 3,
+      content: {
+        items: [
+          {
+            id: 'experience-ai-resume',
+            company: 'AIResumeCraft',
+            role: 'Product Lead',
+            startDate: '2024',
+            endDate: 'Present',
+            description:
+              'Led an AI resume diagnostics workflow and split generation into scoring, suggestions, rewriting, and review stages.',
+          },
+        ],
+      },
+    },
+    {
+      id: 'module-skills',
+      type: 'skills',
+      title: 'Skills',
+      order: 4,
+      content: {
+        skills: [
+          'Vue',
+          'Nuxt',
+          'TypeScript',
+          'Prompt Engineering',
+          'Growth Analytics',
+        ],
+      },
+    },
+  ],
   sections: [
     {
       id: 'section-summary',
       type: 'summary',
-      title: '职业摘要',
+      title: 'Summary',
       markdown:
-        '6 年 AI 产品与增长工具经验，擅长把 LLM 能力落到可验证的业务流程中。',
+        '6 years of AI product and growth tooling experience, focused on turning LLM capabilities into measurable workflows.',
       order: 1,
     },
     {
       id: 'section-experience',
       type: 'experience',
-      title: '核心经历',
+      title: 'Experience',
       markdown:
-        '- 主导 AI 简历诊断系统，首月完成 18k 份简历分析。\n- 将生成式改写流程拆分为评分、建议、重写、复核四个阶段。',
+        '- Led an AI resume diagnostics workflow.\n- Split generation into scoring, suggestions, rewriting, and review stages.',
       order: 2,
     },
     {
       id: 'section-skills',
       type: 'skills',
-      title: '技能',
+      title: 'Skills',
       markdown: 'Vue, Nuxt, TypeScript, Prompt Engineering, Growth Analytics',
       order: 3,
     },
