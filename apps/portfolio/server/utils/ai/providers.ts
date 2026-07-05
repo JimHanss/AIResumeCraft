@@ -32,15 +32,17 @@ const providers: Record<Exclude<AIProviderName, 'mock'>, ProviderConfig> = {
 export async function createResumeDraft(
   payload: ResumeGenerationRequest,
 ): Promise<ResumeGenerationResponse> {
-  if (payload.provider === 'mock') return createMockDraft(payload)
+  if (payload.provider === 'mock')
+    return createMockDraft(payload)
 
   const config = providers[payload.provider]
-  if (!config.apiKey) return createMockDraft(payload)
+  if (!config.apiKey)
+    return createMockDraft(payload)
 
   const response = await fetch(config.baseURL, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${config.apiKey}`,
+      'Authorization': `Bearer ${config.apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

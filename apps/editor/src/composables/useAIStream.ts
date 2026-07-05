@@ -38,12 +38,16 @@ export function useAIStream() {
 
       while (true) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done)
+          break
         content.value += decoder.decode(value, { stream: true })
       }
-    } catch (caught) {
-      if ((caught as Error).name !== 'AbortError') error.value = caught as Error
-    } finally {
+    }
+    catch (caught) {
+      if ((caught as Error).name !== 'AbortError')
+        error.value = caught as Error
+    }
+    finally {
       isStreaming.value = false
     }
   }

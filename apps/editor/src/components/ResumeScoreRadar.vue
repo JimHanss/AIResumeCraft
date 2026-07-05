@@ -17,7 +17,8 @@ let chart: echarts.ECharts | undefined
 let observer: ResizeObserver | undefined
 
 function renderChart() {
-  if (!chartEl.value) return
+  if (!chartEl.value)
+    return
 
   chart ??= echarts.init(chartEl.value)
   chart.setOption({
@@ -58,7 +59,8 @@ watch(() => props.score, renderChart, { deep: true })
 onMounted(() => {
   renderChart()
   observer = new ResizeObserver(() => chart?.resize())
-  if (chartEl.value) observer.observe(chartEl.value)
+  if (chartEl.value)
+    observer.observe(chartEl.value)
 })
 
 onBeforeUnmount(() => {

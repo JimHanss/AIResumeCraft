@@ -63,20 +63,20 @@ test('drags materials into the canvas and reorders modules', async ({
   }
 
   const moduleTypes = async () =>
-    modules.evaluateAll((elements) =>
-      elements.map((element) => element.getAttribute('data-module-type')),
+    modules.evaluateAll(elements =>
+      elements.map(element => element.getAttribute('data-module-type')),
     )
   const moduleIds = async () =>
-    modules.evaluateAll((elements) =>
-      elements.map((element) => element.getAttribute('data-module-id')),
+    modules.evaluateAll(elements =>
+      elements.map(element => element.getAttribute('data-module-id')),
     )
 
   await expect
     .poll(async () => {
       const types = await moduleTypes()
       return materialTypes.every(
-        (moduleType) =>
-          types.filter((type) => type === moduleType).length === 2,
+        moduleType =>
+          types.filter(type => type === moduleType).length === 2,
       )
     })
     .toBe(true)
@@ -118,9 +118,9 @@ test('drags materials into the canvas and reorders modules', async ({
     .poll(async () => {
       const ids = await moduleIds()
       return (
-        ids.join('|') !== beforeReorder.join('|') &&
-        ids.length === 8 &&
-        new Set(ids).size === 8
+        ids.join('|') !== beforeReorder.join('|')
+        && ids.length === 8
+        && new Set(ids).size === 8
       )
     })
     .toBe(true)

@@ -18,7 +18,8 @@ const modules = computed({
 })
 
 function selectAddedModule(event: { added?: { element: ResumeModule } }) {
-  if (event.added) store.selectModule(event.added.element.id)
+  if (event.added)
+    store.selectModule(event.added.element.id)
 }
 
 function updateModule(id: string, patch: Partial<ResumeModule['content']>) {

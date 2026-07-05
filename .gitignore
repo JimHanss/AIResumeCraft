@@ -1,21 +1,29 @@
-node_modules
-.pnpm-store
+# Dependencies
+node_modules/
+.pnpm-store/
 
-dist
-.output
-.nuxt
-.nitro
-storybook-static
-coverage
-playwright-report
-test-results
-.lighthouseci
+# Build and framework outputs
+dist/
+.output/
+.nuxt/
+.nitro/
+storybook-static/
+coverage/
+.lighthouseci/
 
+# Test artifacts
+playwright-report/
+test-results/
+
+# Environment
 .env
 .env.*
 !.env.example
 
+# Logs and caches
 *.log
 *.tsbuildinfo
+
+# OS files
 .DS_Store
 Thumbs.db

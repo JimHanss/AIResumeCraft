@@ -5,5 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="unsupported-module">Unsupported module: {{ type }}</div>
+  <div class="unsupported-module">
+    Unsupported module: {{ type }}
+  </div>
 </template>

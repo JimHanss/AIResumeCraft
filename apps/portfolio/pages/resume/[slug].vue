@@ -23,7 +23,9 @@ useSeoMeta({
       class="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:p-10"
     >
       <header class="border-b border-slate-200 pb-6">
-        <p class="text-sm text-slate-500">/resume/{{ slug }}</p>
+        <p class="text-sm text-slate-500">
+          /resume/{{ slug }}
+        </p>
         <h1 class="mt-3 text-4xl font-semibold tracking-normal text-slate-950">
           {{ demoResume.profile.name }}
         </h1>

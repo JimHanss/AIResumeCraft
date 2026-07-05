@@ -47,7 +47,9 @@ const score = calculateOverallScore(demoResume)
       <aside
         class="rounded-lg border border-slate-200 bg-slate-950 p-6 text-white shadow-sm"
       >
-        <p class="text-sm text-cyan-200">Resume score</p>
+        <p class="text-sm text-cyan-200">
+          Resume score
+        </p>
         <strong class="mt-3 block text-6xl tracking-normal">{{ score }}</strong>
         <dl class="mt-8 space-y-4">
           <div

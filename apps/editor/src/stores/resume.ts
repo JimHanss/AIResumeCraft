@@ -52,8 +52,8 @@ const materialDefinitions: ResumeModuleMaterial[] = [
 
 function hasPersistedResume() {
   return (
-    typeof localStorage !== 'undefined' &&
-    localStorage.getItem(persistenceKey) != null
+    typeof localStorage !== 'undefined'
+    && localStorage.getItem(persistenceKey) != null
   )
 }
 
@@ -78,7 +78,7 @@ export const useResumeStore = defineStore(
     const orderedModules = computed(() => sortModules(document.value.modules))
     const selectedModule = computed(() =>
       document.value.modules.find(
-        (module) => module.id === selectedModuleId.value,
+        module => module.id === selectedModuleId.value,
       ),
     )
     const availableMaterials = computed(() => materialDefinitions)
@@ -89,16 +89,18 @@ export const useResumeStore = defineStore(
       document.value.sections = reorderSections(document.value.sections)
       if (
         !document.value.modules.some(
-          (module) => module.id === selectedModuleId.value,
+          module => module.id === selectedModuleId.value,
         )
-      )
+      ) {
         selectedModuleId.value = document.value.modules[0]?.id
+      }
     }
 
     async function loadInitialResume() {
       restoreDocument(document.value)
 
-      if (hasPersistedResume()) return
+      if (hasPersistedResume())
+        return
 
       if (!shouldLoadMockApi()) {
         restoreDocument(demoResume)
@@ -107,7 +109,8 @@ export const useResumeStore = defineStore(
 
       try {
         restoreDocument(await getDemoResume())
-      } catch {
+      }
+      catch {
         restoreDocument(demoResume)
       }
     }
@@ -121,9 +124,10 @@ export const useResumeStore = defineStore(
       patch: Partial<ResumeDocument['sections'][number]>,
     ) {
       const index = document.value.sections.findIndex(
-        (section) => section.id === id,
+        section => section.id === id,
       )
-      if (index === -1) return
+      if (index === -1)
+        return
 
       document.value.sections[index] = {
         ...document.value.sections[index],
@@ -139,10 +143,11 @@ export const useResumeStore = defineStore(
       const module = createModule(type)
       const modules = [...orderedModules.value]
       const index = afterId
-        ? modules.findIndex((item) => item.id === afterId)
+        ? modules.findIndex(item => item.id === afterId)
         : -1
 
-      if (index >= 0) modules.splice(index + 1, 0, module)
+      if (index >= 0)
+        modules.splice(index + 1, 0, module)
       else modules.push(module)
 
       reorderModules(modules)
@@ -156,9 +161,10 @@ export const useResumeStore = defineStore(
 
     function updateModule(id: string, patch: Partial<ResumeModule['content']>) {
       const index = document.value.modules.findIndex(
-        (module) => module.id === id,
+        module => module.id === id,
       )
-      if (index === -1) return
+      if (index === -1)
+        return
 
       const module = document.value.modules[index]
       const nextModule = {
@@ -171,12 +177,13 @@ export const useResumeStore = defineStore(
 
       document.value.modules[index] = nextModule
 
-      if (nextModule.type === 'avatar') syncProfileFromAvatar(nextModule)
+      if (nextModule.type === 'avatar')
+        syncProfileFromAvatar(nextModule)
     }
 
     function removeModule(id: string) {
       const nextModules = document.value.modules.filter(
-        (module) => module.id !== id,
+        module => module.id !== id,
       )
       document.value.modules = normalizeModuleOrder(nextModules)
 
@@ -185,12 +192,13 @@ export const useResumeStore = defineStore(
     }
 
     function duplicateModule(id: string) {
-      const module = document.value.modules.find((item) => item.id === id)
-      if (!module) return
+      const module = document.value.modules.find(item => item.id === id)
+      if (!module)
+        return
 
       const clone = cloneResumeModule(module)
       const modules = [...orderedModules.value]
-      const index = modules.findIndex((item) => item.id === id)
+      const index = modules.findIndex(item => item.id === id)
       modules.splice(index + 1, 0, clone)
       reorderModules(modules)
       selectedModuleId.value = clone.id

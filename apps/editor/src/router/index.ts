@@ -16,5 +16,6 @@ export const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if (to.meta.requiresAuth) return '/'
+  if (to.meta.requiresAuth)
+    return '/'
 })

@@ -1,40 +1,63 @@
 # Project Progress
 
-## Current Milestone
+## Current Status
 
-Monorepo Editor MVP: local-first resume editor without AI generation.
+The Monorepo Editor MVP is verified and complete. The repository now has a local-first, no-AI Vue editor with typed shared resume modules, Pinia persistence, MSW mock data, drag-and-drop canvas editing, unit coverage, and Chromium E2E coverage.
 
-## Decisions
+## Completed Features
 
-- Keep the existing `apps/editor` package instead of migrating to `packages/editor`.
-- Preserve `packages/shared` compatibility for the existing Nuxt portfolio by keeping `demoResume.sections`.
-- Remove AI controls from the primary editor workspace for this MVP; AI code can remain unused for later milestones.
+### Monorepo Editor MVP
 
-## Completed
+Status: Completed
+Spec: `specs/monorepo-editor-mvp/spec.md`
+Verify: `specs/monorepo-editor-mvp/verify.md`
 
-- pnpm workspace foundation already exists.
-- Shared resume schemas now include typed editable modules.
-- Editor store owns module add, reorder, update, duplicate, remove, reset, and safe restore flows.
-- Editor UI now has a material panel, draggable canvas, dynamic module registry, and editable MVP modules.
-- MSW exposes deterministic mock resume data for the editor resume endpoint.
-- Unit tests cover core store/module behavior.
-- Playwright Chromium E2E now covers loading the editor, dragging every material type into the canvas, reordering modules, and localStorage restore after refresh.
+Summary:
 
-## Remaining Risks
+- Kept the existing `apps/editor` package location instead of migrating to `packages/editor`.
+- Preserved `packages/shared` compatibility for the Nuxt portfolio by keeping legacy `sections` alongside new editable `modules`.
+- Removed primary AI controls from the MVP editor workflow while leaving existing AI helper code available for later milestones.
+- Added shared resume schemas, fixtures, API constants, and pure utilities for typed modules.
+- Added a Pinia `useResumeStore` for initialization, module add/reorder/update/remove/duplicate/reset, selection, preferences, safe restore, and localStorage persistence.
+- Added editor UI for a material panel, draggable canvas, module frame, dynamic module registry, and editable avatar, summary, experience, and skills modules.
+- Added Axios-backed mockable resume data access and MSW handlers for deterministic demo resume data.
+- Added unit and E2E coverage for store behavior, drag-and-drop, editing, and refresh persistence.
 
-- Existing editor ECharts bundle warning is unrelated to the no-AI MVP but remains in the project.
-- Existing Nuxt/Nitro production build warnings remain in the portfolio package.
-- The editor package path differs from the original `packages/editor` request by deliberate decision.
+Validation:
 
-## Validation Snapshot
-
-- `pnpm install`: passed.
-- `pnpm lint`: passed, with Node ESM/CJS experimental warning from tooling.
+- `pnpm install --frozen-lockfile`: passed.
+- `pnpm lint`: passed after `pnpm lint:fix` applied mechanical style fixes.
 - `pnpm typecheck`: passed.
-- `pnpm test:unit`: passed.
-- `pnpm build`: passed, with existing editor chunk-size and Nuxt/Nitro dependency warnings.
+- `pnpm test:unit`: passed, 9 tests.
+- `pnpm build`: passed.
 - `pnpm test:e2e`: passed in Chromium, 2 tests.
-- Browser drag smoke: all four material types drag into the canvas, modules reorder without duplicate ids, edited name restores after refresh.
+- `git diff --check`: passed.
+
+Changed Areas:
+
+- `packages/shared`: resume schemas, fixtures, API route constants, pure module helpers, and shared tests.
+- `apps/editor`: store, API client/helper, MSW mocks, router, workspace layout, material/canvas/module components, module registry, styles, unit tests, and E2E tests.
+- `apps/portfolio`: compatibility updates for shared resume model changes.
+- Project docs and workflow files: `README.md`, `.gitignore`, `PROJECT_PROGRESS.md`, `CODE_MAP.md`, and `specs/monorepo-editor-mvp/*`.
+
+## In Progress
+
+- Feature: None.
+- Current phase: Documentation and hygiene complete for `monorepo-editor-mvp`.
+- Next step: Commit the verification/doc hygiene updates when ready.
+
+## Known Risks
+
+- Risk: The editor build still emits a large chunk warning because ECharts is bundled.
+  Mitigation: Consider code-splitting chart code before production release gating.
+- Risk: The portfolio build still emits Nuxt/Nitro dependency and Node deprecation warnings.
+  Mitigation: Track during Nuxt/Nitro dependency updates.
+- Risk: `pnpm lint` emits a Node experimental ESM/CJS warning from ESLint tooling.
+  Mitigation: Treat as non-blocking unless future Node/tooling versions turn it into a failure.
+- Risk: E2E can emit a non-fatal Vite ResizeObserver notification during drag-heavy tests.
+  Mitigation: Current Playwright assertions pass; revisit only if it becomes test-failing noise.
+- Risk: The editor package path differs from the original `packages/editor` request.
+  Mitigation: This was an explicit MVP decision to keep the existing `apps/editor` workspace shape.
 
 ## Last Updated
 

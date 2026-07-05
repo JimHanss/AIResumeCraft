@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
   return [
     parsed.summary,
     '',
-    ...parsed.highlights.map((item) => `- ${item}`),
+    ...parsed.highlights.map(item => `- ${item}`),
   ].join('\n')
 })

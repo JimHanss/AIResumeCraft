@@ -24,23 +24,27 @@ const emit = defineEmits<{
     @click="emit('select')"
   >
     <header class="module-frame-header">
-      <NSpace align="center" :wrap="false">
-        <span class="drag-handle" :data-testid="`module-drag-${module.id}`"
-          >::</span
+      <NSpace align="center" :wrap="false" class="module-title-group">
+        <span
+          class="drag-handle"
+          :data-testid="`module-drag-${module.id}`"
+          title="Drag"
         >
+          ::
+        </span>
         <strong>{{ module.title }}</strong>
-        <NTag size="small" round>
+        <NTag size="small" round type="info">
           {{ module.type }}
         </NTag>
       </NSpace>
 
       <NSpace :wrap="false" size="small">
-        <NButton size="tiny" secondary @click.stop="emit('duplicate')">
+        <NButton size="tiny" quaternary @click.stop="emit('duplicate')">
           Duplicate
         </NButton>
         <NButton
           size="tiny"
-          secondary
+          quaternary
           type="error"
           @click.stop="emit('remove')"
         >

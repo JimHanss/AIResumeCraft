@@ -35,11 +35,19 @@ const selectedLocale = computed({
 <template>
   <NConfigProvider :theme="store.preferences.darkMode ? darkTheme : null">
     <NMessageProvider>
-      <NLayout class="app-shell" has-sider>
+      <NLayout
+        class="app-shell"
+        :class="{ 'is-dark': store.preferences.darkMode }"
+      >
         <NLayoutHeader bordered class="app-header">
-          <div>
-            <strong>AIResumeCraft</strong>
-            <span>{{ t('app.subtitle') }}</span>
+          <div class="brand-lockup">
+            <div class="brand-mark">
+              AR
+            </div>
+            <div>
+              <strong>AIResumeCraft</strong>
+              <span>{{ t('app.subtitle') }}</span>
+            </div>
           </div>
 
           <NSpace align="center" :wrap="false">

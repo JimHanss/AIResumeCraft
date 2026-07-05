@@ -15,7 +15,7 @@ export const i18n = createI18n({
         abort: '停止',
         aiImprove: 'AI 优化',
         editor: '编辑器',
-        overall: '综合分',
+        overall: '综合',
         score: '评分',
         sections: '模块',
       },

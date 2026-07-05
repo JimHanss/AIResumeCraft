@@ -19,7 +19,7 @@ function updateItems(items: ExperienceItem[]) {
 
 function updateItem(id: string, field: keyof ExperienceItem, value: string) {
   updateItems(
-    props.module.content.items.map((item) =>
+    props.module.content.items.map(item =>
       item.id === id
         ? {
             ...item,
@@ -35,7 +35,7 @@ function addItem() {
 }
 
 function removeItem(id: string) {
-  const nextItems = props.module.content.items.filter((item) => item.id !== id)
+  const nextItems = props.module.content.items.filter(item => item.id !== id)
   updateItems(nextItems.length > 0 ? nextItems : [createExperienceItem()])
 }
 </script>

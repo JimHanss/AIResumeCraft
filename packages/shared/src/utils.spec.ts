@@ -27,7 +27,7 @@ describe('resume utilities', () => {
       },
     ])
 
-    expect(sections.map((section) => section.order)).toEqual([1, 2])
+    expect(sections.map(section => section.order)).toEqual([1, 2])
   })
 
   it('calculates an overall score', () => {
@@ -57,7 +57,7 @@ describe('resume utilities', () => {
       { ...createResumeModule('skills'), order: 4 },
     ])
 
-    expect(modules.map((module) => module.order)).toEqual([1, 2])
+    expect(modules.map(module => module.order)).toEqual([1, 2])
   })
 
   it('falls back for invalid resume documents', () => {

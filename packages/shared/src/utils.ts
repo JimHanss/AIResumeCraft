@@ -92,7 +92,7 @@ export function cloneResumeModule(module: ResumeModule) {
   cloned.id = uid(`module-${module.type}`)
 
   if (cloned.type === 'experience') {
-    cloned.content.items = cloned.content.items.map((item) => ({
+    cloned.content.items = cloned.content.items.map(item => ({
       ...item,
       id: uid('experience'),
     }))
@@ -114,7 +114,8 @@ export function createExperienceItem(): ExperienceResumeModule['content']['items
 
 export function safeResumeDocument(input: unknown, fallback: ResumeDocument) {
   const parsed = resumeDocumentSchema.safeParse(input)
-  if (parsed.success) return parsed.data
+  if (parsed.success)
+    return parsed.data
 
   return structuredClone(fallback)
 }

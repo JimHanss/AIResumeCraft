@@ -13,6 +13,7 @@ const emit = defineEmits<{
 
 <template>
   <NInput
+    class="summary-textarea"
     type="textarea"
     :value="props.module.content.text"
     placeholder="Write a concise professional summary"

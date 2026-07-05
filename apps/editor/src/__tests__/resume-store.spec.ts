@@ -32,8 +32,11 @@ describe('resume store', () => {
     store.reorderModules(reversed)
 
     expect(store.orderedModules[0].order).toBe(1)
-    expect(store.orderedModules.map((module) => module.order)).toEqual([
-      1, 2, 3, 4,
+    expect(store.orderedModules.map(module => module.order)).toEqual([
+      1,
+      2,
+      3,
+      4,
     ])
   })
 
@@ -43,7 +46,7 @@ describe('resume store', () => {
       (module): module is SummaryResumeModule => module.type === 'summary',
     )
     const skillsBefore = store.orderedModules.find(
-      (module) => module.type === 'skills',
+      module => module.type === 'skills',
     )
 
     expect(summary).toBeDefined()
@@ -53,7 +56,7 @@ describe('resume store', () => {
       (module): module is SummaryResumeModule => module.id === summary!.id,
     )
     const skillsAfter = store.orderedModules.find(
-      (module) => module.type === 'skills',
+      module => module.type === 'skills',
     )
 
     expect(updatedSummary?.content.text).toBe('Updated summary')
