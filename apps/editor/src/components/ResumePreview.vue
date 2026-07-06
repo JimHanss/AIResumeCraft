@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type {
   AvatarResumeModule,
+  CustomResumeField,
+  CustomResumeModule,
   EducationResumeItem,
   EducationResumeModule,
   ExperienceResumeModule,
@@ -9,21 +11,32 @@ import type {
   SkillsResumeModule,
   SummaryResumeModule,
 } from '@airesumecraft/shared'
-import { NButton, NButtonGroup, NSelect, NSpace } from 'naive-ui'
+import type { PdfExportQuality } from '../composables/usePdfExport'
+import type {
+  ResumeThemeId,
+  ResumeThemePreviewFontFamily,
+} from '../config/resumeThemes'
+import { NButton, NButtonGroup, NSelect, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Draggable from 'vuedraggable'
 import { useDragSelectionGuard } from '../composables/useDragSelectionGuard'
+import { usePdfExport } from '../composables/usePdfExport'
+import {
+  useResumeValidation,
+  validationMessageKey,
+} from '../composables/useResumeValidation'
+import { getResumeTheme, resumeThemes } from '../config/resumeThemes'
 import { useResumeStore } from '../stores/resume'
 
 const store = useResumeStore()
 const { t } = useI18n()
+const message = useMessage()
 const { clearTextSelection, endDrag, startDrag } = useDragSelectionGuard()
+const { exportError, exportPreview, isExporting } = usePdfExport()
+const { validateResumeForExport } = useResumeValidation()
 
-const fontFamily = ref('sans')
-const fontSize = ref(14)
-const lineHeight = ref(1.65)
-const accentColor = ref('#243447')
+const previewPaperRef = ref<HTMLElement>()
 
 const fontOptions = [
   { label: 'Microsoft YaHei', value: 'sans' },
@@ -38,22 +51,68 @@ const lineHeightOptions = [1.35, 1.5, 1.65, 1.8].map(value => ({
   label: String(Math.round(value * 16)),
   value,
 }))
+const exportQualityOptions = computed(
+  () =>
+    [
+      {
+        label: t('editor.export.standardQuality'),
+        value: 'standard',
+      },
+      {
+        label: t('editor.export.highQuality'),
+        value: 'high',
+      },
+    ] satisfies Array<{ label: string, value: PdfExportQuality }>,
+)
+const resumeThemeOptions = computed(() =>
+  resumeThemes.map(theme => ({
+    label: t(theme.labelKey),
+    value: theme.id,
+  })),
+)
+
+const selectedResumeThemeId = computed({
+  get: () => store.preferences.resumeThemeId,
+  set: (value: ResumeThemeId) => store.setResumeTheme(value),
+})
+const selectedExportQuality = computed({
+  get: () => store.preferences.exportQuality,
+  set: (value: PdfExportQuality) => store.setExportQuality(value),
+})
+const selectedFontFamily = computed({
+  get: () => store.preferences.previewFontFamily,
+  set: (value: ResumeThemePreviewFontFamily) =>
+    store.setPreviewFontFamily(value),
+})
+const selectedFontSize = computed({
+  get: () => store.preferences.previewFontSize,
+  set: (value: number) => store.setPreviewFontSize(value),
+})
+const selectedLineHeight = computed({
+  get: () => store.preferences.previewLineHeight,
+  set: (value: number) => store.setPreviewLineHeight(value),
+})
+
+const activeTheme = computed(() =>
+  getResumeTheme(store.preferences.resumeThemeId),
+)
 
 const fontFamilyValue = computed(() => {
-  if (fontFamily.value === 'serif')
+  if (store.preferences.previewFontFamily === 'serif')
     return 'Georgia, Times New Roman, serif'
 
-  if (fontFamily.value === 'inter')
+  if (store.preferences.previewFontFamily === 'inter')
     return 'Inter, Arial, sans-serif'
 
   return 'Microsoft YaHei, PingFang SC, Inter, Arial, sans-serif'
 })
 
 const previewStyle = computed(() => ({
-  '--preview-accent': accentColor.value,
+  ...activeTheme.value.cssVars,
+  '--preview-accent': store.preferences.previewAccentColor,
   '--preview-font-family': fontFamilyValue.value,
-  '--preview-font-size': `${fontSize.value}px`,
-  '--preview-line-height': String(lineHeight.value),
+  '--preview-font-size': `${store.preferences.previewFontSize}px`,
+  '--preview-line-height': String(store.preferences.previewLineHeight),
 }))
 
 const avatarModule = computed(() =>
@@ -129,6 +188,10 @@ function isSkillsModule(module: ResumeModule): module is SkillsResumeModule {
   return module.type === 'skills'
 }
 
+function isCustomModule(module: ResumeModule): module is CustomResumeModule {
+  return module.type === 'custom'
+}
+
 function moduleTitle(module: ResumeModule) {
   return module.title || t(`modules.${module.type}.title`)
 }
@@ -175,71 +238,187 @@ function educationDetails(item: EducationResumeItem) {
 function skillItems(group: SkillGroup) {
   return group.skills.map(skill => skill.trim()).filter(Boolean)
 }
+
+function customFields(module: CustomResumeModule) {
+  return [...module.content.fields]
+    .sort((left, right) => left.order - right.order)
+    .filter(hasCustomFieldContent)
+}
+
+function hasCustomFieldContent(field: CustomResumeField) {
+  if (field.type === 'list')
+    return field.items.some(item => item.text.trim())
+
+  return Boolean(field.value.trim())
+}
+
+function customFieldStyle(field: CustomResumeField) {
+  return {
+    '--custom-field-span': String(field.span),
+  }
+}
+
+function customListItems(field: CustomResumeField) {
+  return field.type === 'list'
+    ? field.items.map(item => item.text.trim()).filter(Boolean)
+    : []
+}
+
+function safePdfFileName() {
+  const name = profile.value.name.trim()
+  const suffix = t('editor.export.fileSuffix')
+  return `${name || 'AIResumeCraft'}-${suffix}.pdf`
+}
+
+function toggleAccentColor() {
+  const themeAccent
+    = activeTheme.value.defaults.previewAccentColor
+      ?? activeTheme.value.cssVars['--preview-accent']
+  store.setPreviewAccentColor(
+    store.preferences.previewAccentColor === themeAccent
+      ? '#2563eb'
+      : themeAccent,
+  )
+}
+
+async function handleExportPdf() {
+  const validation = validateResumeForExport(store.document)
+  if (!validation.valid) {
+    message.error(t(validationMessageKey(validation.errors[0]!.code)))
+    return
+  }
+
+  const exported = await exportPreview(previewPaperRef.value, {
+    fileName: safePdfFileName(),
+    quality: store.preferences.exportQuality,
+  })
+
+  if (exported) {
+    message.success(t('editor.export.success'))
+    return
+  }
+
+  const fallbackMessage
+    = exportError.value === 'missing-preview'
+      ? t('editor.export.missingPreview')
+      : t('editor.export.failed')
+  message.error(fallbackMessage)
+}
 </script>
 
 <template>
   <section class="preview-workbench" data-testid="resume-preview">
     <div class="preview-toolbar" data-testid="preview-toolbar">
-      <NSpace align="center" :wrap="true" size="small">
-        <NButtonGroup size="small">
-          <NButton type="primary" secondary>
-            {{ t('editor.preview.basicLayout') }}
-          </NButton>
-          <NButton secondary>
-            {{ t('editor.preview.smartTypeset') }}
-          </NButton>
-        </NButtonGroup>
-
-        <NSelect
-          v-model:value="fontFamily"
-          class="preview-select preview-select-wide"
-          size="small"
-          :options="fontOptions"
-        />
-        <label class="preview-control" data-testid="preview-font-size-control">
-          <span>{{ t('editor.preview.fontSize') }}</span>
-          <NSelect
-            v-model:value="fontSize"
-            class="preview-select"
-            size="small"
-            :options="fontSizeOptions"
-          />
-        </label>
-        <label
-          class="preview-control"
-          data-testid="preview-line-height-control"
+      <div class="preview-toolbar-rows">
+        <div
+          class="preview-toolbar-row preview-toolbar-row-primary"
+          data-testid="preview-toolbar-row-primary"
         >
-          <span>{{ t('editor.preview.lineHeight') }}</span>
-          <NSelect
-            v-model:value="lineHeight"
-            class="preview-select"
-            size="small"
-            :options="lineHeightOptions"
-          />
-        </label>
+          <NButtonGroup size="small">
+            <NButton type="primary" secondary>
+              {{ t('editor.preview.basicLayout') }}
+            </NButton>
+            <NButton secondary>
+              {{ t('editor.preview.smartTypeset') }}
+            </NButton>
+          </NButtonGroup>
+        </div>
 
-        <button
-          class="preview-color-swatch"
-          type="button"
-          :style="{ background: accentColor }"
-          :title="t('editor.preview.color')"
-          @click="
-            accentColor = accentColor === '#243447' ? '#2563eb' : '#243447'
-          "
-        />
-        <NButton size="small" secondary>
-          {{ t('editor.preview.templateStyle') }}
-        </NButton>
-        <NButton size="small" secondary>
-          {{ t('editor.actions.addModule') }}
-        </NButton>
-        <NButton size="small" secondary>
-          {{ t('editor.preview.spacing') }}
-        </NButton>
-      </NSpace>
+        <div
+          class="preview-toolbar-row preview-toolbar-row-layout"
+          data-testid="preview-toolbar-row-layout"
+        >
+          <label class="preview-control" data-testid="preview-theme-control">
+            <span>{{ t('editor.preview.templateStyle') }}</span>
+            <NSelect
+              v-model:value="selectedResumeThemeId"
+              class="preview-select preview-select-wide"
+              data-testid="resume-theme-select"
+              size="small"
+              :options="resumeThemeOptions"
+            />
+          </label>
+
+          <NSelect
+            v-model:value="selectedFontFamily"
+            class="preview-select preview-select-wide"
+            data-testid="preview-font-family-select"
+            size="small"
+            :options="fontOptions"
+          />
+          <label
+            class="preview-control"
+            data-testid="preview-font-size-control"
+          >
+            <span>{{ t('editor.preview.fontSize') }}</span>
+            <NSelect
+              v-model:value="selectedFontSize"
+              class="preview-select"
+              size="small"
+              :options="fontSizeOptions"
+            />
+          </label>
+          <label
+            class="preview-control"
+            data-testid="preview-line-height-control"
+          >
+            <span>{{ t('editor.preview.lineHeight') }}</span>
+            <NSelect
+              v-model:value="selectedLineHeight"
+              class="preview-select"
+              size="small"
+              :options="lineHeightOptions"
+            />
+          </label>
+
+          <button
+            class="preview-color-swatch"
+            type="button"
+            :aria-label="t('editor.preview.color')"
+            :style="{ background: store.preferences.previewAccentColor }"
+            :title="t('editor.preview.color')"
+            @click="toggleAccentColor"
+          />
+          <NButton size="small" secondary>
+            {{ t('editor.preview.spacing') }}
+          </NButton>
+        </div>
+
+        <div
+          class="preview-toolbar-row preview-toolbar-row-export"
+          data-testid="preview-toolbar-row-export"
+        >
+          <label class="preview-control" data-testid="export-quality-control">
+            <span>{{ t('editor.export.quality') }}</span>
+            <NSelect
+              v-model:value="selectedExportQuality"
+              class="preview-select preview-select-wide"
+              data-testid="export-quality-select"
+              size="small"
+              :options="exportQualityOptions"
+            />
+          </label>
+          <NButton
+            data-testid="export-pdf-button"
+            :loading="isExporting"
+            secondary
+            size="small"
+            type="primary"
+            @click="handleExportPdf"
+          >
+            {{ t('editor.export.pdf') }}
+          </NButton>
+        </div>
+      </div>
     </div>
 
-    <article class="preview-paper" :style="previewStyle">
+    <article
+      ref="previewPaperRef"
+      class="preview-paper"
+      data-testid="preview-paper"
+      :data-theme="selectedResumeThemeId"
+      :style="previewStyle"
+    >
       <header class="preview-resume-header">
         <div class="preview-seal" aria-hidden="true">
           AR
@@ -368,6 +547,28 @@ function skillItems(group: SkillGroup) {
                     {{ skill }}
                   </li>
                 </ul>
+              </div>
+            </div>
+
+            <div v-else-if="isCustomModule(module)" class="preview-custom-grid">
+              <div
+                v-for="field in customFields(module)"
+                :key="field.id"
+                class="preview-custom-field"
+                :style="customFieldStyle(field)"
+              >
+                <strong v-if="field.label">{{ field.label }}</strong>
+                <ul v-if="field.type === 'list'" class="preview-custom-list">
+                  <li
+                    v-for="item in customListItems(field)"
+                    :key="`${field.id}-${item}`"
+                  >
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else>
+                  {{ field.value }}
+                </p>
               </div>
             </div>
           </section>

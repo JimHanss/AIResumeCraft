@@ -33,9 +33,60 @@ export const i18n = createI18n({
           resetDemo: '\u91CD\u7F6E\u793A\u4F8B\u7B80\u5386',
           save: '\u4FDD\u5B58',
         },
+        customModule: {
+          addListField: '添加列表区',
+          addListItem: '添加列表项',
+          addTextareaField: '添加多行输入',
+          addTextField: '添加单行输入',
+          defaults: {
+            listLabel: '列表',
+            listPlaceholder: '列表项',
+            textLabel: '字段',
+            textPlaceholder: '字段内容',
+            textareaLabel: '描述',
+            textareaPlaceholder: '填写描述内容',
+          },
+          dialogTitle: '自定义模块',
+          editStructure: '编辑结构',
+          emptyFields: '还没有字段，先添加一个字段。',
+          fieldLabel: '字段标题',
+          fields: '字段配置',
+          fieldSpan: '字段宽度',
+          fieldType: '字段类型',
+          fieldTypes: {
+            list: '列表区',
+            text: '单行输入',
+            textarea: '多行输入',
+          },
+          listItem: '列表项',
+          minRows: '显示行数',
+          moduleName: '模块名',
+          moduleNamePlaceholder: '例如：证书、获奖经历、项目补充',
+          placeholder: '占位提示',
+          removeField: '删除字段',
+          spans: {
+            full: '整行',
+            half: '半行',
+            third: '三分之一',
+          },
+          untitledField: '未命名字段',
+          validation: {
+            titleRequired: '请填写模块名。',
+          },
+        },
         empty: {
           canvas:
             '\u5C06\u5DE6\u4FA7\u6A21\u5757\u62D6\u5230\u8FD9\u91CC\u5F00\u59CB\u642D\u5EFA\u7B80\u5386\u3002',
+        },
+        export: {
+          failed: 'PDF 导出失败，请稍后重试。',
+          fileSuffix: '简历',
+          highQuality: '高质量',
+          missingPreview: '没有可导出的简历预览。',
+          pdf: '导出 PDF',
+          quality: '导出质量',
+          standardQuality: '标准质量',
+          success: 'PDF 已导出。',
         },
         fields: {
           avatarUrl: '\u5934\u50CF URL',
@@ -66,6 +117,13 @@ export const i18n = createI18n({
             '\u5199\u4E00\u6BB5\u7B80\u6D01\u7684\u804C\u4E1A\u7B80\u4ECB',
         },
         localDraft: '\u672C\u5730\u8349\u7A3F',
+        history: {
+          cannotRedo: '当前没有可重做的操作',
+          cannotUndo: '当前没有可撤销的操作',
+          label: '历史操作',
+          redo: '重做',
+          undo: '撤销',
+        },
         metrics: {
           modules: '\u6A21\u5757',
           score: '\u8BC4\u5206',
@@ -92,6 +150,10 @@ export const i18n = createI18n({
           spacing: '\u95F4\u8DDD\u914D\u7F6E',
           templateStyle: '\u6A21\u677F\u98CE\u683C',
         },
+        scoreRadar: {
+          subtitle: '基于当前简历内容的模拟评分',
+          title: '评分雷达',
+        },
         scoreDimensions: {
           ats: 'ATS',
           clarity: '\u6E05\u6670\u5EA6',
@@ -108,8 +170,18 @@ export const i18n = createI18n({
           eyebrow: '\u7B80\u5386\u642D\u5EFA',
           title: '\u7F16\u8F91\u5DE5\u4F5C\u53F0',
         },
+        theme: {
+          classicBlue: '经典蓝',
+          modernSky: '浅蓝现代',
+          monoCompact: '黑白紧凑',
+        },
         unsupportedModule:
           '\u6682\u4E0D\u652F\u6301\u7684\u6A21\u5757\uFF1A{type}',
+        validation: {
+          'email-invalid': '邮箱格式不正确。',
+          'name-required': '请先填写姓名。',
+          'preview-empty': '请至少保留一个简历模块后再导出。',
+        },
       },
       modules: {
         avatar: {
@@ -117,6 +189,11 @@ export const i18n = createI18n({
           description:
             '\u59D3\u540D\u3001\u804C\u4E1A\u6807\u9898\u3001\u8054\u7CFB\u65B9\u5F0F\u548C\u5934\u50CF\u3002',
           title: '\u57FA\u672C\u4FE1\u606F',
+        },
+        custom: {
+          badge: '自定义',
+          description: '按响应式网格自由组合字段和列表。',
+          title: '自定义模块',
         },
         education: {
           badge: '\u6559\u80B2',
@@ -172,8 +249,59 @@ export const i18n = createI18n({
           resetDemo: 'Reset demo resume',
           save: 'Save',
         },
+        customModule: {
+          addListField: 'Add list',
+          addListItem: 'Add item',
+          addTextareaField: 'Add textarea',
+          addTextField: 'Add input',
+          defaults: {
+            listLabel: 'List',
+            listPlaceholder: 'List item',
+            textLabel: 'Field',
+            textPlaceholder: 'Field content',
+            textareaLabel: 'Description',
+            textareaPlaceholder: 'Write a description',
+          },
+          dialogTitle: 'Custom module',
+          editStructure: 'Edit structure',
+          emptyFields: 'No fields yet. Add a field to start.',
+          fieldLabel: 'Field label',
+          fields: 'Field setup',
+          fieldSpan: 'Field width',
+          fieldType: 'Field type',
+          fieldTypes: {
+            list: 'List',
+            text: 'Single-line input',
+            textarea: 'Textarea',
+          },
+          listItem: 'List item',
+          minRows: 'Rows',
+          moduleName: 'Module name',
+          moduleNamePlaceholder: 'Example: Certificates, Awards, Projects',
+          placeholder: 'Placeholder',
+          removeField: 'Remove field',
+          spans: {
+            full: 'Full row',
+            half: 'Half row',
+            third: 'One third',
+          },
+          untitledField: 'Untitled field',
+          validation: {
+            titleRequired: 'Enter a module name.',
+          },
+        },
         empty: {
           canvas: 'Drag modules here to build a resume.',
+        },
+        export: {
+          failed: 'PDF export failed. Please try again.',
+          fileSuffix: 'Resume',
+          highQuality: 'High quality',
+          missingPreview: 'No resume preview is available to export.',
+          pdf: 'Export PDF',
+          quality: 'Export quality',
+          standardQuality: 'Standard quality',
+          success: 'PDF exported.',
         },
         fields: {
           avatarUrl: 'Avatar URL',
@@ -202,6 +330,13 @@ export const i18n = createI18n({
           summary: 'Write a concise professional summary',
         },
         localDraft: 'Local draft',
+        history: {
+          cannotRedo: 'Nothing to redo',
+          cannotUndo: 'Nothing to undo',
+          label: 'History actions',
+          redo: 'Redo',
+          undo: 'Undo',
+        },
         metrics: {
           modules: 'Modules',
           score: 'Score',
@@ -228,6 +363,10 @@ export const i18n = createI18n({
           spacing: 'Spacing',
           templateStyle: 'Template style',
         },
+        scoreRadar: {
+          subtitle: 'Mock score based on the current resume',
+          title: 'Score radar',
+        },
         scoreDimensions: {
           ats: 'ATS',
           clarity: 'Clarity',
@@ -244,13 +383,28 @@ export const i18n = createI18n({
           eyebrow: 'Resume builder',
           title: 'Editor workbench',
         },
+        theme: {
+          classicBlue: 'Classic blue',
+          modernSky: 'Modern sky',
+          monoCompact: 'Mono compact',
+        },
         unsupportedModule: 'Unsupported module: {type}',
+        validation: {
+          'email-invalid': 'Enter a valid email address.',
+          'name-required': 'Enter a name before exporting.',
+          'preview-empty': 'Keep at least one resume module before exporting.',
+        },
       },
       modules: {
         avatar: {
           badge: 'Info',
           description: 'Name, headline, contact, and avatar.',
           title: 'Basic Info',
+        },
+        custom: {
+          badge: 'Custom',
+          description: 'Build fields and lists with a responsive grid.',
+          title: 'Custom module',
         },
         education: {
           badge: 'Education',

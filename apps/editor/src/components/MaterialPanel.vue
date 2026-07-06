@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import type { ResumeModuleMaterial } from '../stores/resume'
+import type { CustomModuleBuilderPayload } from './CustomModuleBuilderDialog.vue'
 import { NButton, NSwitch } from 'naive-ui'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Draggable from 'vuedraggable'
 import { useDragSelectionGuard } from '../composables/useDragSelectionGuard'
 import { useResumeStore } from '../stores/resume'
+import CustomModuleBuilderDialog from './CustomModuleBuilderDialog.vue'
 
 const store = useResumeStore()
 const { t } = useI18n()
 const { clearTextSelection, endDrag, startDrag } = useDragSelectionGuard()
+const showCustomModuleBuilder = ref(false)
 
 const moduleIcons = {
   avatar: [
@@ -42,6 +46,12 @@ const moduleIcons = {
     'M13.5 6.5 10.5 17.5',
     'M4.5 20h15',
   ],
+  custom: [
+    'M4.5 5.5h6v6h-6z',
+    'M13.5 5.5h6v6h-6z',
+    'M4.5 14.5h6v4h-6z',
+    'M13.5 14.5h6v4h-6z',
+  ],
 } satisfies Record<ResumeModuleMaterial['type'], string[]>
 
 function cloneMaterial(material: ResumeModuleMaterial) {
@@ -49,7 +59,13 @@ function cloneMaterial(material: ResumeModuleMaterial) {
 }
 
 function addModule() {
-  store.addFirstInactiveModule()
+  showCustomModuleBuilder.value = true
+}
+
+function saveCustomModule(payload: CustomModuleBuilderPayload) {
+  const module = store.addCustomModule(payload)
+  if (module)
+    showCustomModuleBuilder.value = false
 }
 
 function moduleIconPaths(type: ResumeModuleMaterial['type']) {
@@ -118,5 +134,10 @@ function toggleModule(material: ResumeModuleMaterial, enabled: boolean) {
       <span class="module-picker-add-icon" aria-hidden="true">+</span>
       {{ t('editor.actions.addModule') }}
     </NButton>
+
+    <CustomModuleBuilderDialog
+      v-model:show="showCustomModuleBuilder"
+      @save="saveCustomModule"
+    />
   </aside>
 </template>

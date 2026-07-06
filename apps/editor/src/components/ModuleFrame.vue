@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ResumeModule } from '@airesumecraft/shared'
-import { NButton, NInput, NModal, NSpace, NTag } from 'naive-ui'
+import { NButton, NInput, NModal, NSpace } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -57,7 +57,7 @@ function confirmRename() {
     >
       <div class="module-frame-leading">
         <button
-          class="module-toggle-button"
+          class="module-toggle-button module-frame-interactive"
           type="button"
           :aria-expanded="expanded"
           :aria-label="
@@ -66,6 +66,9 @@ function confirmRename() {
           :title="
             expanded ? t('editor.actions.collapse') : t('editor.actions.expand')
           "
+          @pointerdown.stop
+          @mousedown.stop
+          @touchstart.stop
           @click.stop="emit('toggle')"
         >
           <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -75,33 +78,66 @@ function confirmRename() {
         </button>
       </div>
 
-      <button
-        class="module-title-drag-zone"
-        type="button"
-        @click.stop="emit('toggle')"
-      >
-        <strong>{{ moduleTitle }}</strong>
-        <NTag size="small" round type="info">
-          {{ t(`modules.${module.type}.badge`) }}
-        </NTag>
-      </button>
+      <div class="module-title-group">
+        <button
+          class="module-title-drag-zone"
+          type="button"
+          @click.stop="emit('toggle')"
+        >
+          <strong>{{ moduleTitle }}</strong>
+        </button>
+        <NButton
+          class="module-frame-interactive module-icon-action module-title-edit-button"
+          circle
+          data-testid="module-title-edit"
+          quaternary
+          size="tiny"
+          :aria-label="t('editor.actions.edit')"
+          :title="t('editor.actions.edit')"
+          @pointerdown.stop
+          @mousedown.stop
+          @touchstart.stop
+          @click.stop="openRenameModal"
+        >
+          <svg
+            class="button-icon"
+            viewBox="0 0 24 24"
+            focusable="false"
+            aria-hidden="true"
+          >
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </NButton>
+      </div>
 
       <NSpace class="module-frame-actions" :wrap="false" size="small">
         <NButton
-          size="tiny"
-          quaternary
-          data-testid="module-title-edit"
-          @click.stop="openRenameModal"
-        >
-          {{ t('editor.actions.edit') }}
-        </NButton>
-        <NButton
+          class="module-frame-interactive module-icon-action module-remove-button"
+          circle
+          data-testid="module-remove"
           size="tiny"
           quaternary
           type="error"
+          :aria-label="t('editor.actions.remove')"
+          :title="t('editor.actions.remove')"
+          @pointerdown.stop
+          @mousedown.stop
+          @touchstart.stop
           @click.stop="emit('remove')"
         >
-          {{ t('editor.actions.remove') }}
+          <svg
+            class="button-icon"
+            viewBox="0 0 24 24"
+            focusable="false"
+            aria-hidden="true"
+          >
+            <path d="M3 6h18" />
+            <path d="M8 6V4h8v2" />
+            <path d="m19 6-1 14H6L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+          </svg>
         </NButton>
       </NSpace>
     </header>

@@ -1,4 +1,12 @@
 import type {
+  CustomFieldSpan,
+  CustomFieldType,
+  CustomListField,
+  CustomListItem,
+  CustomResumeField,
+  CustomResumeModule,
+  CustomTextareaField,
+  CustomTextField,
   EducationResumeItem,
   ExperienceResumeItem,
   ResumeDocument,
@@ -96,6 +104,11 @@ export function createResumeModule<T extends ResumeModuleType>(
           groups: [createSkillGroup()],
         },
       } as ResumeModuleFor<T>
+    case 'custom':
+      return createCustomResumeModule({
+        id: base.id,
+        order: base.order,
+      }) as ResumeModuleFor<T>
   }
 }
 
@@ -124,7 +137,32 @@ export function cloneResumeModule(module: ResumeModule) {
     }))
   }
 
+  if (cloned.type === 'custom') {
+    cloned.content.fields = cloned.content.fields.map(field =>
+      cloneCustomField(field),
+    )
+  }
+
   return cloned
+}
+
+function cloneCustomField(field: CustomResumeField): CustomResumeField {
+  const clonedField = {
+    ...field,
+    id: uid('custom-field'),
+  }
+
+  if (clonedField.type === 'list') {
+    return {
+      ...clonedField,
+      items: clonedField.items.map(item => ({
+        ...item,
+        id: uid('custom-list-item'),
+      })),
+    }
+  }
+
+  return clonedField
 }
 
 export function createExperienceItem(): ExperienceResumeItem {
@@ -165,6 +203,83 @@ export function createSkillGroup(
     name,
     skills,
   }
+}
+
+export function createCustomListItem(text = ''): CustomListItem {
+  return {
+    id: uid('custom-list-item'),
+    text,
+  }
+}
+
+export function createCustomField<T extends CustomFieldType>(
+  type: T,
+  overrides: Partial<CustomResumeField> = {},
+): Extract<CustomResumeField, { type: T }> {
+  const base = {
+    id: uid('custom-field'),
+    label: '',
+    order: 1,
+    placeholder: '',
+    span: 12 as CustomFieldSpan,
+    ...overrides,
+    type,
+  }
+
+  if (type === 'list') {
+    const listOverrides = overrides as Partial<CustomListField>
+    return {
+      ...base,
+      items: listOverrides.items ?? [createCustomListItem()],
+      minRows: listOverrides.minRows ?? 3,
+    } as Extract<CustomResumeField, { type: T }>
+  }
+
+  if (type === 'textarea') {
+    const textareaOverrides = overrides as Partial<CustomTextareaField>
+    return {
+      ...base,
+      minRows: textareaOverrides.minRows ?? 3,
+      value: textareaOverrides.value ?? '',
+    } as Extract<CustomResumeField, { type: T }>
+  }
+
+  const textOverrides = overrides as Partial<CustomTextField>
+  return {
+    ...base,
+    value: textOverrides.value ?? '',
+  } as Extract<CustomResumeField, { type: T }>
+}
+
+export function createCustomResumeModule(
+  input: Partial<CustomResumeModule> = {},
+): CustomResumeModule {
+  const fields = input.content?.fields?.length
+    ? normalizeCustomFields(input.content.fields)
+    : [
+        createCustomField('text', {
+          label: 'Field',
+          order: 1,
+          placeholder: 'Field',
+        }),
+      ]
+
+  return {
+    id: input.id ?? uid('module-custom'),
+    type: 'custom',
+    title: input.title?.trim() || 'Custom Module',
+    order: input.order ?? 1,
+    content: {
+      fields,
+    },
+  }
+}
+
+export function normalizeCustomFields(fields: CustomResumeField[]) {
+  return fields.map((field, index) => ({
+    ...field,
+    order: index + 1,
+  }))
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -240,6 +355,81 @@ function migrateSkillGroup(group: unknown): SkillGroup | unknown {
   }
 }
 
+function numberValue(value: unknown, fallback: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function customSpanValue(value: unknown): CustomFieldSpan {
+  return value === 6 || value === 4 || value === 12 ? value : 12
+}
+
+function migrateCustomListItem(item: unknown): CustomListItem {
+  if (!isRecord(item)) {
+    return createCustomListItem(typeof item === 'string' ? item : '')
+  }
+
+  return {
+    id: stringValue(item.id, uid('custom-list-item')),
+    text: stringValue(item.text),
+  }
+}
+
+function migrateCustomField(field: unknown, index: number): CustomResumeField {
+  if (!isRecord(field)) {
+    return createCustomField('text', {
+      label: `Field ${index + 1}`,
+      order: index + 1,
+    })
+  }
+
+  const base = {
+    id: stringValue(field.id, uid('custom-field')),
+    label: stringValue(field.label),
+    order: numberValue(field.order, index + 1),
+    placeholder: stringValue(field.placeholder),
+    span: customSpanValue(field.span),
+  }
+
+  if (field.type === 'textarea') {
+    return createCustomField('textarea', {
+      ...base,
+      minRows: Math.max(1, Math.round(numberValue(field.minRows, 3))),
+      value: stringValue(field.value),
+    })
+  }
+
+  if (field.type === 'list') {
+    return createCustomField('list', {
+      ...base,
+      items: Array.isArray(field.items)
+        ? field.items.map(migrateCustomListItem)
+        : [createCustomListItem()],
+      minRows: Math.max(1, Math.round(numberValue(field.minRows, 3))),
+    })
+  }
+
+  return createCustomField('text', {
+    ...base,
+    value: stringValue(field.value),
+  })
+}
+
+function migrateCustomModule(module: Record<string, unknown>) {
+  const content = isRecord(module.content) ? module.content : {}
+  const fields = Array.isArray(content.fields)
+    ? content.fields.map(migrateCustomField)
+    : []
+
+  return {
+    ...module,
+    title: stringValue(module.title, 'Custom Module') || 'Custom Module',
+    content: {
+      ...content,
+      fields: normalizeCustomFields(fields),
+    },
+  }
+}
+
 function migrateResumeModule(module: unknown): unknown {
   if (!isRecord(module))
     return module
@@ -303,6 +493,9 @@ function migrateResumeModule(module: unknown): unknown {
       },
     }
   }
+
+  if (module.type === 'custom')
+    return migrateCustomModule(module)
 
   return module
 }

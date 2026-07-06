@@ -1,6 +1,7 @@
 import type { ResumeModuleType } from '@airesumecraft/shared'
 import type { Component } from 'vue'
 import AvatarModule from './AvatarModule.vue'
+import CustomModule from './CustomModule.vue'
 import EducationModule from './EducationModule.vue'
 import ExperienceModule from './ExperienceModule.vue'
 import SkillsModule from './SkillsModule.vue'
@@ -12,6 +13,7 @@ export const moduleComponents = {
   education: EducationModule,
   experience: ExperienceModule,
   skills: SkillsModule,
+  custom: CustomModule,
 } satisfies Record<ResumeModuleType, Component>
 
 export function getModuleComponent(type: ResumeModuleType) {

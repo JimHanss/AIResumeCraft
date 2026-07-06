@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GlobalThemeOverrides } from 'naive-ui'
+import { calculateOverallScore } from '@airesumecraft/shared'
 import {
   darkTheme,
   dateEnUS,
@@ -12,12 +13,12 @@ import {
   NLayoutHeader,
   NMessageProvider,
   NSelect,
-  NSpace,
   zhCN,
 } from 'naive-ui'
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterView } from 'vue-router'
+import HistoryControls from './components/HistoryControls.vue'
 import { useResumeStore } from './stores/resume'
 
 const store = useResumeStore()
@@ -43,6 +44,11 @@ const selectedLocale = computed({
     locale.value = value
     store.setLocale(value as 'zh-CN' | 'en-US')
   },
+})
+
+const overallScore = computed(() => {
+  const score = calculateOverallScore(store.document)
+  return Number.isFinite(score) ? score : 0
 })
 
 const lightThemeOverrides: GlobalThemeOverrides = {
@@ -136,7 +142,16 @@ const activeNaiveDateLocale = computed(() =>
             </div>
           </div>
 
-          <NSpace align="center" :wrap="false">
+          <div class="header-actions">
+            <HistoryControls />
+            <div
+              class="header-score"
+              data-testid="header-score"
+              :aria-label="`${t('editor.metrics.score')} ${overallScore}`"
+            >
+              <span>{{ t('editor.metrics.score') }}</span>
+              <strong>{{ overallScore }}</strong>
+            </div>
             <NSelect
               v-model:value="selectedLocale"
               class="locale-select"
@@ -145,7 +160,7 @@ const activeNaiveDateLocale = computed(() =>
             <NButton secondary @click="store.toggleTheme">
               {{ store.preferences.darkMode ? t('app.light') : t('app.dark') }}
             </NButton>
-          </NSpace>
+          </div>
         </NLayoutHeader>
 
         <NLayoutContent>

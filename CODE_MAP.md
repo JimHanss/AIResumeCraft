@@ -6,6 +6,9 @@
 - `apps/portfolio`: Nuxt 3 portfolio site and BFF routes.
 - `packages/shared`: shared schemas, fixtures, API constants, and pure utilities.
 - `specs/resume-editor-core-enhancements`: Spec workflow documents for the completed editor core enhancement.
+- `specs/editor-theme-export-i18n`: Spec workflow documents for editor themes, PDF export, history, radar scoring, and i18n.
+- `specs/editor-layout-metrics-cleanup`: Spec workflow documents for header score placement, sidebar score radar layout, and workspace metric cleanup.
+- `specs/custom-module-builder`: Spec workflow documents for the custom module builder, responsive custom fields, and local persistence.
 - `tests/e2e`: Playwright browser coverage for the editor.
 
 ## Spec Workflow Documents
@@ -23,6 +26,45 @@ Purpose:
 
 - Records the accepted scope, technical plan, completed task checklist, verification evidence, known risks, and follow-up notes for the education module, grouped skills, unified field controls, and preview reorder feature.
 
+### Editor Theme Export I18n
+
+Paths:
+
+- `specs/editor-theme-export-i18n/spec.md`
+- `specs/editor-theme-export-i18n/plan.md`
+- `specs/editor-theme-export-i18n/tasks.md`
+- `specs/editor-theme-export-i18n/verify.md`
+
+Purpose:
+
+- Records the Chinese spec workflow for preview themes, A4 PDF export, undo/redo, score radar visibility, validation, i18n coverage, and browser verification.
+
+### Editor Layout Metrics Cleanup
+
+Paths:
+
+- `specs/editor-layout-metrics-cleanup/spec.md`
+- `specs/editor-layout-metrics-cleanup/plan.md`
+- `specs/editor-layout-metrics-cleanup/tasks.md`
+- `specs/editor-layout-metrics-cleanup/verify.md`
+
+Purpose:
+
+- Records the Chinese spec workflow for removing workspace metric clutter, moving the score into the sticky header, and placing the radar chart below the module selector.
+
+### Custom Module Builder
+
+Paths:
+
+- `specs/custom-module-builder/spec.md`
+- `specs/custom-module-builder/plan.md`
+- `specs/custom-module-builder/tasks.md`
+- `specs/custom-module-builder/verify.md`
+
+Purpose:
+
+- Records the Chinese spec workflow, task completion, and verification evidence for adding a modal-based custom module builder with single-line fields, textarea fields, list fields, responsive grid spans, editor rendering, preview rendering, and local persistence.
+
 ## Pages / Screens
 
 ### Editor App Shell
@@ -33,11 +75,12 @@ Path:
 
 Purpose:
 
-- Hosts the editor route, global header, locale selector, and theme toggle.
+- Hosts the editor route, global header, sticky score display, locale selector, and theme toggle.
 
 Functions:
 
 - `selectedLocale`: Bridges the Naive UI locale selector to the resume store locale.
+- `overallScore`: Computes the sticky header score from shared score utilities with a safe fallback.
 
 ### Resume Workspace
 
@@ -47,11 +90,11 @@ Path:
 
 Purpose:
 
-- Loads initial resume data and lays out the material panel, canvas, state summary, score radar, and preview.
+- Loads initial resume data and lays out the material panel, left-side score radar, history controls, canvas, and preview.
 
 Functions:
 
-- `overallScore`: Computes the displayed resume score from shared score utilities.
+- `sidebarScore`: Computes the left-side score radar number from shared score utilities with a safe fallback.
 
 ### Portfolio Home
 
@@ -87,12 +130,31 @@ Path:
 
 Purpose:
 
-- Shows avatar, summary, education, experience, and skills materials with local SVG icons and supports drag cloning into the canvas.
+- Shows avatar, summary, education, experience, and skills materials with local SVG icons, supports drag cloning into the canvas, and opens the custom module builder from the add-module button.
 
 Functions:
 
 - `cloneMaterial`: Creates a fresh module instance for vuedraggable clone operations.
-- `addMaterial`: Adds the selected material directly through the store.
+- `addModule`: Opens the custom module builder dialog.
+- `saveCustomModule`: Persists a configured custom module through the resume store.
+
+### Custom Module Builder Dialog
+
+Path:
+
+- `apps/editor/src/components/CustomModuleBuilderDialog.vue`
+
+Purpose:
+
+- Provides the non-fullscreen modal used to configure custom module names, field types, field labels, placeholders, responsive grid widths, textarea row counts, list items, and field ordering.
+
+Functions:
+
+- `resetDraft`: Initializes a new or existing custom module draft when the modal opens.
+- `addField`, `removeField`, and `updateField`: Maintain the custom field configuration list.
+- `updateFieldType`: Converts one configured field between text, textarea, and list types.
+- `updateListItems`, `addListItem`, `updateListItem`, and `removeListItem`: Maintain initial list field items.
+- `save`: Validates the module name and emits a normalized custom module payload.
 
 ### Resume Canvas
 
@@ -133,7 +195,7 @@ Path:
 
 Purpose:
 
-- Renders the ECharts score radar for the current resume score dimensions.
+- Renders the ECharts score radar for the current resume score dimensions below the module selector, with a stable `resume-score-radar` test id and guarded ResizeObserver resize scheduling.
 
 Functions:
 
@@ -147,7 +209,7 @@ Path:
 
 Purpose:
 
-- Renders the right-side resume preview, labeled template controls, and whole-section `vuedraggable` body-module ordering synced with the Pinia store.
+- Renders the right-side resume preview, theme/typography/export controls, PDF export trigger, and whole-section `vuedraggable` body-module ordering synced with the Pinia store.
 
 Functions:
 
@@ -155,6 +217,17 @@ Functions:
 - `startPreviewDrag`: Starts preview drag state and suppresses accidental text selection.
 - `moduleTitle`: Reads a custom module title with a localized type-title fallback.
 - `dateRange`, `textBullets`, `educationDetails`, and `skillItems`: Format preview-safe display values without dangling separators.
+- `customFields`, `hasCustomFieldContent`, `customFieldStyle`, and `customListItems`: Format custom module fields for responsive preview rendering.
+
+### History Controls
+
+Path:
+
+- `apps/editor/src/components/HistoryControls.vue`
+
+Purpose:
+
+- Provides semantic undo/redo navigation buttons wired to `useResumeStore.canUndo`, `canRedo`, `undo()`, and `redo()`.
 
 ### Field Components
 
@@ -245,6 +318,23 @@ Functions:
 - `addGroup` and `removeGroup`: Add or remove skill groups.
 - `updateSkill`, `addSkill`, and `removeSkill`: Mutate skill items inside a group.
 
+### Custom Module
+
+Path:
+
+- `apps/editor/src/components/modules/CustomModule.vue`
+
+Purpose:
+
+- Renders custom module fields in the middle editor, supports text and textarea editing, list item add/remove/reorder, and opens the builder dialog to edit the custom module structure.
+
+Functions:
+
+- `orderedFields`: Sorts configured custom fields by order.
+- `updateFields` and `updateField`: Emit custom field content updates through the canvas.
+- `updateListItems`, `addListItem`, `updateListItem`, and `removeListItem`: Maintain custom list field content.
+- `replaceSchema`: Emits updated custom module structure back to the canvas/store.
+
 ### Unsupported Module
 
 Path:
@@ -279,7 +369,7 @@ Path:
 
 Purpose:
 
-- Owns resume document state, material definitions, selected module state, preferences, persistence, and all module mutations.
+- Owns resume document state, material definitions, selected module state, preferences, session undo/redo history, persistence, and all module mutations.
 
 Functions:
 
@@ -291,6 +381,8 @@ Functions:
 - `updateSection`: Patches one legacy section by id.
 - `createModule`: Builds a new typed resume module with shared utilities.
 - `addModule`: Inserts a new module after an optional target id and selects it.
+- `addCustomModule`: Validates and inserts a configured custom module while selecting it.
+- `replaceCustomModuleSchema`: Updates an existing custom module's title and field schema without creating a duplicate module.
 - `reorderModules`: Normalizes module order and writes the reordered list.
 - `updateModule`: Patches one module content object and syncs avatar fields to profile data.
 - `removeModule`: Deletes one module and repairs selection if needed.
@@ -300,7 +392,19 @@ Functions:
 - `selectModule`: Sets the active module id.
 - `setLocale`: Updates the resume document locale.
 - `toggleTheme`: Toggles the persisted dark mode preference.
+- `setResumeTheme`, `setPreviewFontFamily`, `setPreviewFontSize`, `setPreviewLineHeight`, `setPreviewAccentColor`, and `setExportQuality`: Update persisted editor preview/export preferences while recording undo history.
+- `undo` and `redo`: Restore session snapshots of resume content and editor preferences.
 - `syncProfileFromAvatar`: Mirrors avatar content into top-level profile fields for compatibility.
+
+### Resume Themes
+
+Path:
+
+- `apps/editor/src/config/resumeThemes.ts`
+
+Purpose:
+
+- Defines `classic-blue`, `modern-sky`, and `mono-compact` preview themes, including localized label keys, CSS variables, and default typography/export preview values.
 
 ## API / Services
 
@@ -376,6 +480,26 @@ Functions:
 - `stream`: Posts resume generation payloads and reads the streamed response.
 - `abort`: Cancels the active streaming request.
 
+### PDF Export Composable
+
+Path:
+
+- `apps/editor/src/composables/usePdfExport.ts`
+
+Purpose:
+
+- Encapsulates `html2canvas` and `jsPDF` for A4 portrait PDF export from the preview paper, with standard/high quality settings, loading state, error state, export-only styling, and multi-page canvas slicing.
+
+### Resume Validation Composable
+
+Path:
+
+- `apps/editor/src/composables/useResumeValidation.ts`
+
+Purpose:
+
+- Provides reusable validation for required name, email format, non-empty preview export, and stable i18n error keys.
+
 ### Portfolio AI Route
 
 Path:
@@ -425,6 +549,9 @@ Exports:
 - `educationResumeModuleSchema`: Validates editable education module content.
 - `experienceResumeModuleSchema`: Validates editable experience module content.
 - `skillsResumeModuleSchema`: Validates editable skills module content.
+- `customResumeModuleSchema`: Validates custom module field schemas and content.
+- `customResumeFieldSchema`: Validates custom text, textarea, and list fields.
+- `customListItemSchema`: Validates custom list field items.
 - `resumeModuleSchema`: Validates any discriminated resume module.
 - `resumeScoreSchema`: Validates score dimensions and overall score.
 - `resumeDocumentSchema`: Validates complete resume document payloads.
@@ -479,6 +606,10 @@ Functions:
 - `createExperienceItem`: Builds a blank experience item.
 - `createEducationItem`: Builds a blank education item.
 - `createSkillGroup`: Builds a blank grouped skills item.
+- `createCustomField`: Builds a custom text, textarea, or list field.
+- `createCustomListItem`: Builds a custom list field item.
+- `createCustomResumeModule`: Builds a custom module with normalized fields.
+- `normalizeCustomFields`: Rewrites custom field order values.
 - `safeResumeDocument`: Migrates compatible old module payloads, parses unknown input, and falls back to a known-good resume.
 - `calculateOverallScore`: Reads the overall score with a safe zero fallback.
 
@@ -489,11 +620,13 @@ Functions:
 Paths:
 
 - `apps/editor/src/__tests__/resume-store.spec.ts`
+- `apps/editor/src/components/__tests__/ResumePreview.spec.ts`
+- `apps/editor/src/composables/__tests__/useResumeValidation.spec.ts`
 - `packages/shared/src/utils.spec.ts`
 
 Purpose:
 
-- Cover module creation, education and grouped skills behavior, migration defaults, unique ids, reorder normalization, update isolation, safe restore, and shared utility behavior.
+- Cover module creation, education and grouped skills behavior, custom module creation/migration/preview rendering, migration defaults, unique ids, reorder normalization, update isolation, safe restore, preview preferences, undo/redo, PDF export trigger flow, validation, and shared utility behavior.
 
 ### Editor E2E
 
@@ -503,17 +636,18 @@ Path:
 
 Purpose:
 
-- Verifies editor loading, local SVG material icons, sticky header behavior, material drag-in for all module types, independent expansion, module title editing, middle and preview module reorder, education editing, grouped skill editing, and localStorage refresh restore in Chromium.
+- Verifies editor loading, local SVG material icons, sticky header score behavior, left-side score radar placement, removed workspace metrics, custom module creation/editing/persistence/deletion, theme and typography persistence, undo/redo, responsive overflow checks, module title editing, middle and preview module reorder, education editing, grouped skill editing, and localStorage refresh restore in Chromium.
 
 Functions:
 
 - `openFreshEditor`: Opens the editor after clearing persisted localStorage.
-- `dragMaterialToCanvas`: Uses mouse gestures to drag a material into the canvas.
+- `createCustomModule`: Creates a minimal custom module through the add-module dialog.
 
 ## Validation
 
 ```bash
 corepack yarn install --immutable
+corepack yarn workspace @airesumecraft/editor typecheck
 corepack yarn lint
 corepack yarn typecheck
 corepack yarn test:unit
@@ -522,4 +656,4 @@ corepack yarn build
 git diff --check
 ```
 
-Manual browser smoke checks for feature verification are recorded in `specs/resume-editor-core-enhancements/verify.md`.
+Manual browser smoke checks for feature verification are recorded in `specs/resume-editor-core-enhancements/verify.md`, `specs/editor-theme-export-i18n/verify.md`, `specs/editor-layout-metrics-cleanup/verify.md`, and `specs/custom-module-builder/verify.md`.

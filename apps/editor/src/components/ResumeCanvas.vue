@@ -132,6 +132,13 @@ function removeModule(id: string) {
 function renameModule(id: string, title: string) {
   store.renameModule(id, title)
 }
+
+function replaceCustomModuleSchema(
+  id: string,
+  payload: Parameters<typeof store.replaceCustomModuleSchema>[1],
+) {
+  store.replaceCustomModuleSchema(id, payload)
+}
 </script>
 
 <template>
@@ -144,10 +151,12 @@ function renameModule(id: string, title: string) {
       v-model="modules"
       item-key="id"
       handle=".module-frame-header"
+      filter=".module-frame-interactive, .module-frame-interactive *"
       ghost-class="drag-ghost"
       :move="syncPreviewOrderFromMove"
       :force-fallback="true"
       :group="{ name: 'resume-modules', pull: true, put: true }"
+      :prevent-on-filter="false"
       class="canvas-list"
       data-testid="resume-canvas-list"
       @change="selectAddedModule"
@@ -168,6 +177,7 @@ function renameModule(id: string, title: string) {
             :is="getModuleComponent(element.type) ?? UnsupportedModule"
             :module="element"
             :type="element.type"
+            @replace-schema="replaceCustomModuleSchema(element.id, $event)"
             @update="updateModule(element.id, $event)"
           />
         </ModuleFrame>

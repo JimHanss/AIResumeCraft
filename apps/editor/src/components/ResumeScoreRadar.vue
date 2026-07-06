@@ -19,6 +19,7 @@ const { locale, t } = useI18n()
 const chartEl = ref<HTMLDivElement>()
 let chart: echarts.ECharts | undefined
 let observer: ResizeObserver | undefined
+let resizeFrame = 0
 
 function renderChart() {
   if (!chartEl.value)
@@ -105,19 +106,32 @@ watch(
   () => void nextTick(renderChart),
 )
 
+function scheduleResize() {
+  if (resizeFrame)
+    return
+
+  resizeFrame = window.requestAnimationFrame(() => {
+    resizeFrame = 0
+    chart?.resize()
+  })
+}
+
 onMounted(() => {
   renderChart()
-  observer = new ResizeObserver(() => chart?.resize())
+  observer = new ResizeObserver(scheduleResize)
   if (chartEl.value)
     observer.observe(chartEl.value)
 })
 
 onBeforeUnmount(() => {
+  if (resizeFrame)
+    window.cancelAnimationFrame(resizeFrame)
+
   observer?.disconnect()
   chart?.dispose()
 })
 </script>
 
 <template>
-  <div ref="chartEl" class="score-radar" />
+  <div ref="chartEl" class="score-radar" data-testid="resume-score-radar" />
 </template>

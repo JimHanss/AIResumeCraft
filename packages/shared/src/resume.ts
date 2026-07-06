@@ -18,6 +18,7 @@ export const resumeModuleTypeSchema = z.enum([
   'education',
   'experience',
   'skills',
+  'custom',
 ])
 
 export const resumeProfileSchema = z.object({
@@ -113,12 +114,64 @@ export const skillsResumeModuleSchema = resumeModuleBaseSchema.extend({
   }),
 })
 
+export const customFieldTypeSchema = z.enum(['text', 'textarea', 'list'])
+
+export const customFieldSpanSchema = z.union([
+  z.literal(12),
+  z.literal(6),
+  z.literal(4),
+])
+
+export const customListItemSchema = z.object({
+  id: z.string().min(1),
+  text: z.string(),
+})
+
+const customFieldBaseSchema = z.object({
+  id: z.string().min(1),
+  label: z.string(),
+  order: z.number().int().positive(),
+  placeholder: z.string().optional(),
+  span: customFieldSpanSchema,
+})
+
+export const customTextFieldSchema = customFieldBaseSchema.extend({
+  type: z.literal('text'),
+  value: z.string(),
+})
+
+export const customTextareaFieldSchema = customFieldBaseSchema.extend({
+  type: z.literal('textarea'),
+  minRows: z.number().int().positive().optional(),
+  value: z.string(),
+})
+
+export const customListFieldSchema = customFieldBaseSchema.extend({
+  type: z.literal('list'),
+  items: z.array(customListItemSchema),
+  minRows: z.number().int().positive().optional(),
+})
+
+export const customResumeFieldSchema = z.discriminatedUnion('type', [
+  customTextFieldSchema,
+  customTextareaFieldSchema,
+  customListFieldSchema,
+])
+
+export const customResumeModuleSchema = resumeModuleBaseSchema.extend({
+  type: z.literal('custom'),
+  content: z.object({
+    fields: z.array(customResumeFieldSchema),
+  }),
+})
+
 export const resumeModuleSchema = z.discriminatedUnion('type', [
   avatarResumeModuleSchema,
   summaryResumeModuleSchema,
   educationResumeModuleSchema,
   experienceResumeModuleSchema,
   skillsResumeModuleSchema,
+  customResumeModuleSchema,
 ])
 
 export const resumeScoreSchema = z.object({
@@ -149,6 +202,14 @@ export type ExperienceResumeModule = z.infer<
 >
 export type EducationResumeModule = z.infer<typeof educationResumeModuleSchema>
 export type SkillsResumeModule = z.infer<typeof skillsResumeModuleSchema>
+export type CustomFieldType = z.infer<typeof customFieldTypeSchema>
+export type CustomFieldSpan = z.infer<typeof customFieldSpanSchema>
+export type CustomListItem = z.infer<typeof customListItemSchema>
+export type CustomTextField = z.infer<typeof customTextFieldSchema>
+export type CustomTextareaField = z.infer<typeof customTextareaFieldSchema>
+export type CustomListField = z.infer<typeof customListFieldSchema>
+export type CustomResumeField = z.infer<typeof customResumeFieldSchema>
+export type CustomResumeModule = z.infer<typeof customResumeModuleSchema>
 export type ExperienceResumeItem
   = ExperienceResumeModule['content']['items'][number]
 export type EducationResumeItem

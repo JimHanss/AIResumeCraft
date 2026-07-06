@@ -19,6 +19,7 @@ coverage/
 
 # Test artifacts
 .playwright-cli/
+output/pdf-export/
 output/playwright/
 playwright-report/
 test-results/
